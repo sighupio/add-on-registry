@@ -1,21 +1,25 @@
-<h1>
-    <img src="https://github.com/sighupio/fury-distribution/blob/main/docs/assets/fury-epta-white.png?raw=true" align="left" width="90" style="margin-right: 15px"/>
-    Kubernetes Fury Registry
+<h1 align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sighupio/distribution/refs/heads/main/docs/assets/white-logo.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/sighupio/distribution/refs/heads/main/docs/assets/black-logo.png">
+  <img alt="Shows a black logo in light color mode and a white one in dark color mode." src="https://raw.githubusercontent.com/sighupio/distribution/refs/heads/main/docs/assets/white-logo.png">
+</picture><br/>
+  Registry Add-On Module
 </h1>
 
-![Release](https://img.shields.io/github/v/release/sighupio/fury-kubernetes-registry?label=Latest%20Release)
-![License](https://img.shields.io/github/license/sighupio/fury-kubernetes-registry?label=License)
+![Release](https://img.shields.io/github/v/release/sighupio/add-on-registry?label=Latest%20Release)
+![License](https://img.shields.io/github/license/sighupio/add-on-registry?label=License)
 ![Slack](https://img.shields.io/badge/slack-@kubernetes/fury-yellow.svg?logo=slack&label=Slack)
 
-<!-- <KFD-DOCS> -->
+<!-- <SD-DOCS> -->
 
-**Kubernetes Fury Registry** provides all components necessary to deploy a container registry on top of Kubernetes based on the [Harbor project][harbor-site] for the [Kubernetes Fury Distribution (KFD)][kfd-repo].
+**Registry Add-On Module** provides all components necessary to deploy a container registry on top of Kubernetes based on the [Harbor project][harbor-site] for the [SIGHUP Distribution (SD)][kfd-repo].
 
-If you are new to KFD please refer to the [official documentation][kfd-docs] on how to get started with KFD.
+If you are new to SD please refer to the [official documentation][sd-docs] on how to get started with SD.
 
 ## Packages
 
-Kubernetes Fury Registry provides the following packages:
+Registry Add-On Module provides the following packages:
 
 | Package                  | Version  | Description                                                                                                                                                          |
 | ------------------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -40,7 +44,7 @@ The table shows the latest 4 compatible versions. Check the [compatibility matri
 
 | Tool                        | Version    | Description                                                                                                                                                    |
 | --------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [furyctl][furyctl-repo]     | `>=0.6.0`  | The recommended tool to download and manage KFD modules and their packages. To learn more about `furyctl` read the [official documentation][furyctl-repo].     |
+| [furyctl][furyctl-repo]     | `>=0.6.0`  | The recommended tool to download and manage SD modules and their packages. To learn more about `furyctl` read the [official documentation][furyctl-repo].     |
 | [kustomize][kustomize-repo] | `>=3.10.0` | Packages are customized using `kustomize`. To learn how to create your customization layer with `kustomize`, please refer to the [repository][kustomize-repo]. |
 
 All packages in this repository have the following dependencies, for package specific dependencies, please visit the single package's documentation:
@@ -100,7 +104,7 @@ The following set of alerts is included:
 
 ### Examples
 
-To see examples on how to customize Kubernetes Fury Registry, please view the [examples](examples) directory.
+To see examples on how to customize Registry Add-On Module, please view the [examples](examples) directory.
 
 <!-- Links -->
 [harbor-site]: https://goharbor.io/
@@ -109,10 +113,10 @@ To see examples on how to customize Kubernetes Fury Registry, please view the [e
 [sighup-page]: https://sighup.io
 [kfd-repo]: https://github.com/sighupio/fury-distribution
 [kustomize-repo]: https://github.com/kubernetes-sigs/kustomize
-[kfd-docs]: https://docs.kubernetesfury.com/docs/distribution/
-[compatibility-matrix]: https://github.com/sighupio/fury-kubernetes-registry/blob/master/docs/COMPATIBILITY_MATRIX.md
+[sd-docs]: https://docs.kubernetesfury.com/docs/distribution/
+[compatibility-matrix]: https://github.com/sighupio/add-on-registry/blob/master/docs/COMPATIBILITY_MATRIX.md
 
-<!-- </KFD-DOCS> -->
+<!-- </SD-DOCS> -->
 
 <!-- <FOOTER> -->
 
@@ -122,7 +126,7 @@ Before contributing, please read first the [Contributing Guidelines](docs/CONTRI
 
 ### Reporting Issues
 
-In case you experience any problem with the module, please [open a new issue](https://github.com/sighupio/fury-kubernetes-registry/issues/new/choose).
+In case you experience any problem with the module, please [open a new issue](https://github.com/sighupio/add-on-registry/issues/new/choose).
 
 ## License
 
