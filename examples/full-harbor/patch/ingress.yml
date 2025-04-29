@@ -21,19 +21,11 @@
 
 - op: replace
   path: /spec/rules/0/host
-  value: harbor.%YOUR_DOMAIN%
-
-- op: replace
-  path: /spec/rules/1/host
-  value: notary.%YOUR_DOMAIN%
+  value: harbor.kriive.wtf
 
 - op: replace
   path: /spec/tls/0/hosts/0
-  value: harbor.%YOUR_DOMAIN%
-
-- op: replace
-  path: /spec/tls/0/hosts/1
-  value: notary.%YOUR_DOMAIN%
+  value: harbor.kriive.wtf
 
 - op: replace
   path: "/metadata/annotations/cert-manager.io~1cluster-issuer"

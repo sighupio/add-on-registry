@@ -10,10 +10,7 @@ namespace: registry
 images:
   - name: goharbor/harbor-db
     newName: registry.sighup.io/fury/goharbor/harbor-db
-    newTag: v2.7.0
-  - name: busybox
-    newName: registry.sighup.io/fury/busybox
-    newTag: latest
+    newTag: v2.9.5
 
 resources:
   - sts.yml

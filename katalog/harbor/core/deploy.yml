@@ -10,6 +10,7 @@ metadata:
   labels:
     app: harbor
     component: core
+    app.kubernetes.io/component: core
 spec:
   replicas: 1
   selector:
@@ -28,75 +29,86 @@ spec:
       automountServiceAccountToken: false
       terminationGracePeriodSeconds: 120
       containers:
-        - name: core
-          image: goharbor/harbor-core
-          imagePullPolicy: Always
-          livenessProbe:
-            httpGet:
-              path: api/v2.0/ping
-              port: 8080
-            initialDelaySeconds: 300
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: api/v2.0/ping
-              port: 8080
-            initialDelaySeconds: 20
-            periodSeconds: 10
-          resources:
-            requests:
-              memory: 256Mi
-              cpu: 100m
-          envFrom:
-            - configMapRef:
+      - name: core
+        image: goharbor/harbor-core
+        imagePullPolicy: Always
+        startupProbe:
+          httpGet:
+            path: /api/v2.0/ping
+            scheme: HTTP
+            port: 8080
+          failureThreshold: 360
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /api/v2.0/ping
+            scheme: HTTP
+            port: 8080
+          failureThreshold: 2
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/v2.0/ping
+            scheme: HTTP
+            port: 8080
+          initialDelaySeconds: 20
+          failureThreshold: 2
+          periodSeconds: 10
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 100m
+        envFrom:
+          - configMapRef:
+              name: core
+          - secretRef:
+              name: core
+        env:
+          - name: CORE_SECRET
+            valueFrom:
+              secretKeyRef:
                 name: core
-            - secretRef:
-                name: core
-          env:
-            - name: CORE_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: core
-                  key: secret
-            - name: JOBSERVICE_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: jobservice
-                  key: secret
-          ports:
-            - containerPort: 8080
-          volumeMounts:
-            - name: config
-              mountPath: /etc/core/app.conf
-              subPath: app.conf
-            - name: secret-key
-              mountPath: /etc/core/key
-              subPath: key
-            - name: token-service-private-key
-              mountPath: /etc/core/private_key.pem
-              subPath: tls.key
-            - mountPath: /etc/core/ca
-              name: ca-download
-            - name: psc
-              mountPath: /etc/core/token
-      volumes:
+                key: secret
+          - name: JOBSERVICE_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: jobservice
+                key: secret
+        ports:
+        - containerPort: 8080
+        volumeMounts:
         - name: config
-          configMap:
-            name: core
-            items:
-              - key: app.conf
-                path: app.conf
+          mountPath: /etc/core/app.conf
+          subPath: app.conf
         - name: secret-key
-          secret:
-            secretName: core
-            items:
-              - key: secretKey
-                path: key
+          mountPath: /etc/core/key
+          subPath: key
         - name: token-service-private-key
-          secret:
-            secretName: core-root-ca
+          mountPath: /etc/core/private_key.pem
+          subPath: tls.key
         - name: ca-download
-          secret:
-            secretName: core-root-ca
+          mountPath: /etc/core/ca
         - name: psc
-          emptyDir: {}
+          mountPath: /etc/core/token
+      volumes:
+      - name: config
+        configMap:
+          name: core
+          items:
+            - key: app.conf
+              path: app.conf
+      - name: secret-key
+        secret:
+          secretName: core
+          items:
+            - key: secretKey
+              path: key
+      - name: token-service-private-key
+        secret:
+          secretName: core-root-ca
+      - name: ca-download
+        secret:
+          secretName: core-root-ca
+      - name: psc
+        emptyDir: {}

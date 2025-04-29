@@ -10,7 +10,7 @@ namespace: registry
 images:
   - name: goharbor/harbor-portal
     newName: registry.sighup.io/fury/goharbor/harbor-portal
-    newTag: v2.7.0
+    newTag: v2.9.5
 
 resources:
   - deploy.yml

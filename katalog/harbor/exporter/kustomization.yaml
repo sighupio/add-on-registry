@@ -17,7 +17,7 @@ resources:
 images:
   - name: goharbor/harbor-exporter
     newName: registry.sighup.io/fury/goharbor/harbor-exporter
-    newTag: v2.7.0
+    newTag: v2.9.5
 
 configMapGenerator:
   - name: exporter
