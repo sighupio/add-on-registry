@@ -10,6 +10,7 @@ resources:
   - ../../katalog/harbor/distributions/full-harbor
 
 configMapGenerator:
+    # Core overwritable configuration
   - name: core
     behavior: merge
     files:
