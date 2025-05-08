@@ -2,13 +2,14 @@
 ## How to update
 Harbor distributes itself as a Helm chart. 
 
+
 ### Look for the target version
 Search the Chart version that you'll need with
-```
+```bash
 helm search repo harbor/harbor --versions
 ```
 ### Download and template the Helm Chart
-```
+```bash
 helm template harbor harbor/harbor --version <helm-chart-version> --output-dir <custom-directory>
 ```
 
