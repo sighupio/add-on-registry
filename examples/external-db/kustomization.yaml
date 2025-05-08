@@ -11,14 +11,7 @@ bases:
   - ../../katalog/harbor/distributions/full-harbor
 
 configMapGenerator:
-    # Clair overwritable configuration
-  - name: clair
-    behavior: merge
-    literals:
-      - HTTP_PROXY=
-      - HTTPS_PROXY=
-      - SCANNER_LOG_LEVEL=info
-    # Core overwritable configuration
+  # Core overwritable configuration
   - name: core
     behavior: merge
     files:
@@ -30,11 +23,6 @@ configMapGenerator:
       - POSTGRESQL_DATABASE=registry
       - POSTGRESQL_SSLMODE=disable
       - EXT_ENDPOINT=https://harbor.%YOUR_DOMAIN%:%YOUR_PORT%
-      - CLAIR_DB_HOST=%YOUR_DB_HOSTNAME%
-      - CLAIR_DB_PORT=%YOUR_DB_PORT%
-      - CLAIR_DB_USERNAME=%YOUR_DB_USER%
-      - CLAIR_DB=clair
-      - CLAIR_DB_SSLMODE=disable
       - LOG_LEVEL=info
       - _REDIS_URL=redis:6379
       - _REDIS_URL_REG=redis://redis:6379/2
@@ -57,15 +45,7 @@ configMapGenerator:
       - ctl-config.yml=config/registry/ctl-config.yml
 
 secretGenerator:
-    # Clair overwritable configuration
-  - name: clair
-    behavior: merge
-    files:
-      - config.yaml=secrets/clair/config.yaml
-    literals:
-      - SCANNER_STORE_REDIS_URL=redis://redis:6379
-      - SCANNER_CLAIR_DATABASE_URL=postgres://%YOUR_DB_USER%:%YOUR_DB_PASSWORD%@%YOUR_DB_HOSTNAME%:%YOUR_DB_PORT%/clair?sslmode=disable
-    # Core overwritable configuration
+  # Core overwritable configuration
   - name: core
     behavior: merge
     literals:
@@ -73,7 +53,6 @@ secretGenerator:
       - secret=P447FhxLeLwjDMYU
       - HARBOR_ADMIN_PASSWORD=Harbor12345
       - POSTGRESQL_PASSWORD=changeit
-      - CLAIR_DB_PASSWORD=changeit
     # JobService overwritable configuration
   - name: jobservice
     behavior: merge
