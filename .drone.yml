@@ -590,6 +590,136 @@ volumes:
       path: /var/run/docker.sock
 
 ---
+name: e2e-kubernetes-1.32
+kind: pipeline
+type: docker
+
+depends_on:
+  - policeman
+  - e2e-kubernetes-1.31
+
+clone:
+  depth: 1
+
+platform:
+  os: linux
+  arch: amd64
+
+trigger:
+  ref:
+    include:
+      - refs/tags/**
+
+steps:
+  - name: generate-kind-config
+    image: alpine:latest
+    pull: always
+    commands:
+      - sh ./katalog/tests/harbor/config/generate-template.sh v1.32.0
+
+  - name: create-kind-cluster
+    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
+    pull: always
+    depends_on:
+      - clone
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
+    environment:
+      CLUSTER_VERSION: v1.32.0
+      KUBECONFIG: kubeconfig-harbor-v1.32.0
+      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.32.0
+    commands:
+      - kind create cluster --name $${CLUSTER_NAME} --image registry.sighup.io/fury/kindest/node:$${CLUSTER_VERSION} --config ./config-$${CLUSTER_NAME}.yaml
+      - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
+
+  - name: e2e-setup
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
+    pull: always
+    network_mode: host
+    environment:
+      KUBECONFIG: kubeconfig-harbor-v1.32.0
+      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.32.0
+      TEST_DOMAIN: "127.0.0.1.nip.io"
+      FURYCTL_VERSION: v0.29.10
+    depends_on:
+      - create-kind-cluster
+    commands:
+      - . ./env-$${CLUSTER_NAME}.env
+      - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-$(uname -s)-amd64.tar.gz" -o /tmp/furyctl.tar.gz && tar xfz /tmp/furyctl.tar.gz -C /tmp
+      - mv /tmp/furyctl /usr/local/bin/furyctl && chmod +x /usr/local/bin/furyctl
+      - until kubectl get serviceaccount default > /dev/null 2>&1; do echo "waiting for control-plane" && sleep 1; done
+      - bats -t katalog/tests/harbor/setup.sh
+
+  - name: e2e-vulns
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
+    pull: always
+    network_mode: host
+    environment:
+      KUBECONFIG: kubeconfig-harbor-v1.32.0
+      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.32.0
+      TEST_DOMAIN: "127.0.0.1.nip.io"
+    depends_on:
+      - e2e-setup
+    commands:
+      - . ./env-$${CLUSTER_NAME}.env
+      - bats -t katalog/tests/harbor/vulns.sh
+
+  - name: e2e-replication
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
+    pull: always
+    network_mode: host
+    environment:
+      KUBECONFIG: kubeconfig-harbor-v1.32.0
+      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.32.0
+      TEST_DOMAIN: "127.0.0.1.nip.io"
+    depends_on:
+      - e2e-setup
+    commands:
+      - . ./env-$${CLUSTER_NAME}.env
+      - bats -t katalog/tests/harbor/replication.sh
+
+  - name: e2e-registry
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
+    pull: always
+    network_mode: host
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
+    environment:
+      KUBECONFIG: kubeconfig-harbor-v1.32.0
+      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.32.0
+      TEST_DOMAIN: "127.0.0.1.nip.io"
+    depends_on:
+      - e2e-setup
+    commands:
+      - . ./env-$${CLUSTER_NAME}.env
+      - bats -t katalog/tests/harbor/registry.sh
+
+  - name: delete-kind-cluster
+    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
+    environment:
+      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.32.0
+    commands:
+      - kind delete cluster --name $${CLUSTER_NAME} || true
+    depends_on:
+      - e2e-vulns
+      - e2e-replication
+      - e2e-registry
+    when:
+      status:
+        - success
+        - failure
+
+volumes:
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock
+
+---
 name: release
 kind: pipeline
 type: docker
@@ -599,6 +729,7 @@ depends_on:
   - e2e-kubernetes-1.29
   - e2e-kubernetes-1.30
   - e2e-kubernetes-1.31
+  - e2e-kubernetes-1.32
 
 platform:
   os: linux
