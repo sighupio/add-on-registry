@@ -27,6 +27,7 @@ loop_it(){
     if [ $retry_counter -ge $max_retry ]; then echo "Timeout waiting a condition"; return 1; fi
     sleep ${wait_time} && echo "# waiting..." $retry_counter >&3
     run ${1}
+    echo $output
     ko=${status}
     loop_it_result=${ko}
     retry_counter=$((retry_counter + 1))
