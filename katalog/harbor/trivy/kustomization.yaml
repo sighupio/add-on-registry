@@ -16,8 +16,8 @@ images:
   - name: goharbor/trivy-adapter-photon
     newName: registry.sighup.io/fury/goharbor/trivy-adapter-photon-offline
     newTag: v2.9.5
-  - name: registry.sighup.io/fury/kubectl
-    newTag: v1.32.0
+  - name: registry.sighup.io/fury/bitnami/kubectl
+    newTag: "1.30.2"
 
 configMapGenerator:
   - literals:
