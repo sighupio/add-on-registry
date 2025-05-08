@@ -15,6 +15,6 @@ resources:
   - ../../portal
   - ../../redis
   - ../../registry
-  # - ../../exporter
+  - ../../exporter
   - ingress.yml
   - ns.yaml
