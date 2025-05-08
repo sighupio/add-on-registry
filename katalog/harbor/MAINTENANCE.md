@@ -1,7 +1,6 @@
 # Development notes
 ## How to update
-Harbor distributes itself as a Helm chart. 
-
+Harbor distributes itself as a Helm chart.
 
 ### Look for the target version
 Search the Chart version that you'll need with
