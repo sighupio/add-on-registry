@@ -17,52 +17,52 @@ metadata:
     cert-manager.io/cluster-issuer: "letsencrypt-staging"
 spec:
   tls:
-  - secretName: harbor-ingress-cert
-    hosts:
-    - core.harbor.domain
+    - secretName: harbor-ingress-cert
+      hosts:
+        - core.harbor.domain
   rules:
-  - http:
-      paths:
-      - path: /api/
-        pathType: Prefix
-        backend:
-          service:
-            name: core
-            port:
-              name: http-web
-      - path: /service/
-        pathType: Prefix
-        backend:
-          service:
-            name: core
-            port:
-              name: http-web
-      - path: /v2/
-        pathType: Prefix
-        backend:
-          service:
-            name: core
-            port:
-              name: http-web
-      - path: /chartrepo/
-        pathType: Prefix
-        backend:
-          service:
-            name: core
-            port:
-              name: http-web
-      - path: /c/
-        pathType: Prefix
-        backend:
-          service:
-            name: core
-            port:
-              name: http-web
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: portal
-            port:
-              number: 80
-    host: core.harbor.domain
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: portal
+                port:
+                  number: 80
+          - path: /api/
+            pathType: Prefix
+            backend:
+              service:
+                name: core
+                port:
+                  name: http-web
+          - path: /service/
+            pathType: Prefix
+            backend:
+              service:
+                name: core
+                port:
+                  name: http-web
+          - path: /v2/
+            pathType: Prefix
+            backend:
+              service:
+                name: core
+                port:
+                  name: http-web
+          - path: /chartrepo/
+            pathType: Prefix
+            backend:
+              service:
+                name: core
+                port:
+                  name: http-web
+          - path: /c/
+            pathType: Prefix
+            backend:
+              service:
+                name: core
+                port:
+                  name: http-web
+      host: core.harbor.domain

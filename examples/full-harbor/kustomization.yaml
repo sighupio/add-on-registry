@@ -10,7 +10,7 @@ resources:
   - ../../katalog/harbor/distributions/full-harbor
 
 configMapGenerator:
-    # Core overwritable configuration
+  # Core overwritable configuration
   - name: core
     behavior: merge
     files:
@@ -55,12 +55,12 @@ configMapGenerator:
       - SCANNER_TRIVY_IGNORE_UNFIXED="false"
 
 secretGenerator:
-    # Core overwritable configuration
+  # Core overwritable configuration
   - name: core
     behavior: merge
     literals:
       - secretKey=not-a-secure-key
-      - secret=P447FhxLeLwjDMYU 
+      - secret=P447FhxLeLwjDMYU
       - HARBOR_ADMIN_PASSWORD=Harbor12345
       - POSTGRESQL_PASSWORD=changeit
     # Database overwritable configuration

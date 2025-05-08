@@ -27,32 +27,32 @@ spec:
         fsGroup: 10000
       automountServiceAccountToken: false
       containers:
-      - name: portal
-        image: goharbor/harbor-portal
-        imagePullPolicy: Always
-        resources:
-          requests:
-            memory: 256Mi
-            cpu: 100m
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 8080
-          initialDelaySeconds: 300
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 8080
-          initialDelaySeconds: 1
-          periodSeconds: 10
-        ports:
-        - containerPort: 8080
-        volumeMounts:
-        - name: portal-config
-          mountPath: /etc/nginx/nginx.conf
-          subPath: nginx.conf
+        - name: portal
+          image: goharbor/harbor-portal
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 100m
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 300
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 1
+            periodSeconds: 10
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: portal-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
       volumes:
-      - name: portal-config
-        configMap:
-          name: portal
+        - name: portal-config
+          configMap:
+            name: portal

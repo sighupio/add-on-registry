@@ -30,34 +30,34 @@ spec:
       automountServiceAccountToken: false
       terminationGracePeriodSeconds: 120
       containers:
-      - name: redis
-        image: goharbor/redis-photon
-        imagePullPolicy: Always
-        livenessProbe:
-          tcpSocket:
-            port: 6379
-          initialDelaySeconds: 300
-          periodSeconds: 10
-        readinessProbe:
-          tcpSocket:
-            port: 6379
-          initialDelaySeconds: 1
-          periodSeconds: 10
+        - name: redis
+          image: goharbor/redis-photon
+          imagePullPolicy: Always
+          livenessProbe:
+            tcpSocket:
+              port: 6379
+            initialDelaySeconds: 300
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 6379
+            initialDelaySeconds: 1
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 100m
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/redis
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          app: harbor
+          component: redis
+      spec:
+        accessModes: ["ReadWriteOnce"]
         resources:
           requests:
-            memory: 256Mi
-            cpu: 100m
-        volumeMounts:
-        - name: data
-          mountPath: /var/lib/redis
-  volumeClaimTemplates:
-  - metadata:
-      name: data
-      labels:
-        app: harbor
-        component: redis
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      resources:
-        requests:
-          storage: "1Gi"
+            storage: "1Gi"

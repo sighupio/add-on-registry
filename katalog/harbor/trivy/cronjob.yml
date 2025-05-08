@@ -9,11 +9,11 @@ metadata:
   name: update-trivy-db-cronjob
 spec:
   concurrencyPolicy: Forbid
-  schedule: '0 4 * * *'
+  schedule: "0 4 * * *"
   jobTemplate:
     spec:
-      backoffLimit: 2 
-      activeDeadlineSeconds: 600 
+      backoffLimit: 2
+      activeDeadlineSeconds: 600
       template:
         spec:
           serviceAccountName: update-trivy-db-sa
@@ -22,22 +22,22 @@ spec:
             - name: kubectl
               image: registry.sighup.io/fury/kubectl
               command:
-                - 'kubectl'
-                - 'rollout'
-                - 'restart'
-                - 'statefulsets/trivy'
+                - "kubectl"
+                - "rollout"
+                - "restart"
+                - "statefulsets/trivy"
               livenessProbe:
                 exec:
                   command:
-                  - kubectl
-                  - version
+                    - kubectl
+                    - version
                 initialDelaySeconds: 5
                 timeoutSeconds: 10
               readinessProbe:
                 exec:
                   command:
-                  - kubectl
-                  - version
+                    - kubectl
+                    - version
                 initialDelaySeconds: 5
                 timeoutSeconds: 10
               resources:

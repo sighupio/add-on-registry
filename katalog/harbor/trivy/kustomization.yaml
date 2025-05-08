@@ -7,49 +7,47 @@ kind: Kustomization
 namespace: registry
 
 resources:
-- sts.yml
-- svc.yml
-- rbac.yml
-- cronjob.yml
-
-
+  - sts.yml
+  - svc.yml
+  - rbac.yml
+  - cronjob.yml
 
 images:
-- name: goharbor/trivy-adapter-photon
-  newName: registry.sighup.io/fury/goharbor/trivy-adapter-photon-offline
-  newTag: v2.9.5
-- name: registry.sighup.io/fury/kubectl
-  newTag: v1.32.0
+  - name: goharbor/trivy-adapter-photon
+    newName: registry.sighup.io/fury/goharbor/trivy-adapter-photon-offline
+    newTag: v2.9.5
+  - name: registry.sighup.io/fury/kubectl
+    newTag: v1.32.0
 
 configMapGenerator:
-- literals:
-  - HTTP_PROXY=""
-  - HTTPS_PROXY=""
-  - NO_PROXY="core,jobservice,database,chartmuseum,trivy,notary-server,notary-signer,registry,portal,exporter,127.0.0.1,localhost,.local,.internal"
-  - SCANNER_LOG_LEVEL="info"
-  - SCANNER_TRIVY_CACHE_DIR="/home/scanner/.cache/trivy"
-  - SCANNER_TRIVY_REPORTS_DIR="/home/scanner/.cache/reports"
-  - SCANNER_TRIVY_DEBUG_MODE="false"
-  - SCANNER_TRIVY_VULN_TYPE="os,library"
-  - SCANNER_TRIVY_SEVERITY="UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
-  - SCANNER_TRIVY_IGNORE_UNFIXED="false"
-  - SCANNER_TRIVY_SKIP_UPDATE="true"
-  - SCANNER_TRIVY_INSECURE="false"
-  - SCANNER_API_SERVER_ADDR=":8080"
-  - SCANNER_TRIVY_TIMEOUT="5m0s"
-  - SCANNER_TRIVY_SECURITY_CHECKS="vuln"
-  - SCANNER_TRIVY_OFFLINE_SCAN="true"
-  name: trivy
+  - literals:
+      - HTTP_PROXY=""
+      - HTTPS_PROXY=""
+      - NO_PROXY="core,jobservice,database,chartmuseum,trivy,notary-server,notary-signer,registry,portal,exporter,127.0.0.1,localhost,.local,.internal"
+      - SCANNER_LOG_LEVEL="info"
+      - SCANNER_TRIVY_CACHE_DIR="/home/scanner/.cache/trivy"
+      - SCANNER_TRIVY_REPORTS_DIR="/home/scanner/.cache/reports"
+      - SCANNER_TRIVY_DEBUG_MODE="false"
+      - SCANNER_TRIVY_VULN_TYPE="os,library"
+      - SCANNER_TRIVY_SEVERITY="UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+      - SCANNER_TRIVY_IGNORE_UNFIXED="false"
+      - SCANNER_TRIVY_SKIP_UPDATE="true"
+      - SCANNER_TRIVY_INSECURE="false"
+      - SCANNER_API_SERVER_ADDR=":8080"
+      - SCANNER_TRIVY_TIMEOUT="5m0s"
+      - SCANNER_TRIVY_SECURITY_CHECKS="vuln"
+      - SCANNER_TRIVY_OFFLINE_SCAN="true"
+    name: trivy
 
 secretGenerator:
-- literals:
-  - SCANNER_TRIVY_GITHUB_TOKEN=""
-  - SCANNER_REDIS_URL="redis://redis:6379/5?idle_timeout_seconds=30"
-  - SCANNER_STORE_REDIS_URL="redis://redis:6379/5?idle_timeout_seconds=30"
-  - SCANNER_JOB_QUEUE_REDIS_URL="redis://redis:6379/5?idle_timeout_seconds=30"
-  name: trivy
+  - literals:
+      - SCANNER_TRIVY_GITHUB_TOKEN=""
+      - SCANNER_REDIS_URL="redis://redis:6379/5?idle_timeout_seconds=30"
+      - SCANNER_STORE_REDIS_URL="redis://redis:6379/5?idle_timeout_seconds=30"
+      - SCANNER_JOB_QUEUE_REDIS_URL="redis://redis:6379/5?idle_timeout_seconds=30"
+    name: trivy
 labels:
-- includeSelectors: true
-  pairs:
-    app: harbor
-    component: trivy
+  - includeSelectors: true
+    pairs:
+      app: harbor
+      component: trivy

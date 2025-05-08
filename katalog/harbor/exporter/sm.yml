@@ -11,8 +11,8 @@ metadata:
   name: harbor
 spec:
   endpoints:
-  - honorLabels: true
-    port: http-metrics
+    - honorLabels: true
+      port: http-metrics
   jobLabel: app.kubernetes.io/name
   selector:
     matchLabels:

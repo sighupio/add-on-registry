@@ -30,58 +30,58 @@ spec:
       automountServiceAccountToken: false
       terminationGracePeriodSeconds: 120
       containers:
-      - name: jobservice
-        image: goharbor/harbor-jobservice
-        imagePullPolicy: Always
-        livenessProbe:
-          httpGet:
-            path: /api/v1/stats
-            port: 8080
-          initialDelaySeconds: 300
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /api/v1/stats
-            port: 8080
-          initialDelaySeconds: 20
-          periodSeconds: 10
-        resources:
-          requests:
-            memory: 256Mi
-            cpu: 100m
-        envFrom:
-          - configMapRef:
-              name: jobservice
-          - secretRef:
-              name: jobservice
-        env:
-          - name: CORE_SECRET
-            valueFrom:
-              secretKeyRef:
-                name: core
-                key: secret
-          - name: JOBSERVICE_SECRET
-            valueFrom:
-              secretKeyRef:
+        - name: jobservice
+          image: goharbor/harbor-jobservice
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /api/v1/stats
+              port: 8080
+            initialDelaySeconds: 300
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/v1/stats
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 100m
+          envFrom:
+            - configMapRef:
                 name: jobservice
-                key: secret
-        ports:
-        - containerPort: 8080
-        volumeMounts:
-        - name: config
-          mountPath: /etc/jobservice/config.yml
-          subPath: config.yml
-        - name: job-logs
-          mountPath: /var/log/jobs
-        - name: job-scandata-exports
-          mountPath: /var/scandata_exports
+            - secretRef:
+                name: jobservice
+          env:
+            - name: CORE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: core
+                  key: secret
+            - name: JOBSERVICE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jobservice
+                  key: secret
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: config
+              mountPath: /etc/jobservice/config.yml
+              subPath: config.yml
+            - name: job-logs
+              mountPath: /var/log/jobs
+            - name: job-scandata-exports
+              mountPath: /var/scandata_exports
       volumes:
-      - name: config
-        configMap:
-          name: jobservice
-      - name: job-logs
-        persistentVolumeClaim:
-          claimName: pvc-jobservice
-      - name: job-scandata-exports
-        persistentVolumeClaim:
-          claimName: pvc-job-scandata-exports
+        - name: config
+          configMap:
+            name: jobservice
+        - name: job-logs
+          persistentVolumeClaim:
+            claimName: pvc-jobservice
+        - name: job-scandata-exports
+          persistentVolumeClaim:
+            claimName: pvc-job-scandata-exports

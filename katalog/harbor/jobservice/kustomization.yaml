@@ -42,4 +42,3 @@ secretGenerator:
       - secret=Gx6IsNtY4NdWoK0u
       - REGISTRY_CREDENTIAL_USERNAME=harbor_registry_user
       - REGISTRY_CREDENTIAL_PASSWORD=DhQTxjwUAyUZHaMABvm90dGAJMDX5jaa
-      

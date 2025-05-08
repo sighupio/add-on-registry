@@ -29,34 +29,34 @@ spec:
       terminationGracePeriodSeconds: 30
       automountServiceAccountToken: false
       containers:
-      - name: exporter
-        image: goharbor/harbor-exporter
-        imagePullPolicy: IfNotPresent
-        args:
-          - -log-level
-          - info
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 8001
-            scheme: HTTP
-          initialDelaySeconds: 300
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 8001
-            scheme: HTTP
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        envFrom:
-        - configMapRef:
-            name: exporter
-        - secretRef:
-            name: exporter      
-        ports:
-        - containerPort: 8080
+        - name: exporter
+          image: goharbor/harbor-exporter
+          imagePullPolicy: IfNotPresent
+          args:
+            - -log-level
+            - info
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8001
+              scheme: HTTP
+            initialDelaySeconds: 300
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8001
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          envFrom:
+            - configMapRef:
+                name: exporter
+            - secretRef:
+                name: exporter
+          ports:
+            - containerPort: 8080
       volumes:
-      - name: config
-        secret:
-          secretName: exporter
+        - name: config
+          secret:
+            secretName: exporter
