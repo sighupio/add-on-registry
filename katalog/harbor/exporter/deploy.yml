@@ -31,7 +31,7 @@ spec:
       containers:
         - name: exporter
           image: goharbor/harbor-exporter
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           args:
             - -log-level
             - info

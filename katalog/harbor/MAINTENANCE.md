@@ -1,11 +1,21 @@
 # Development notes
+## How to update
+Harbor distributes itself as a Helm chart. 
 
-## Harbor
+### Look for the target version
+Search the Chart version that you'll need with
+```
+helm search repo harbor/harbor --versions
+```
+### Download and template the Helm Chart
+```
+helm template harbor harbor/harbor --version <helm-chart-version> --output-dir <custom-directory>
+```
 
-Here is explained how we develop the Harbor package inside the registry SIGHUP module. It's essential to
-maintain this document updated. So, any new/modified action has to be written here.
+### Check the diff and update the images
+At this point you should check the differences and adapt them. Keep in mind that you will probably need to update images in the SIGHUP registry.
 
-### Service monitor manifests
+## Service monitor manifests
 
 The service monitor manifests `katalog/harbor/exporter/sm.yml` file has been templated from:
 
@@ -22,10 +32,8 @@ All the following examples are tested in the pipeline
 
 - [setup](../../katalog/tests/harbor/setup.sh)
 - [vulns](../../katalog/tests/harbor/vulns.sh)
-- [chartmuseum](../../katalog/tests/harbor/chartmuseum.sh)
 - [replication](../../katalog/tests/harbor/replication.sh)
 - [registry](../../katalog/tests/harbor/registry.sh)
-- [registry-notary](../../katalog/tests/harbor/registry-notary.sh)
 
 ### Dashboard and Rules
 
