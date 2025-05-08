@@ -68,14 +68,7 @@ load "./../lib/helper"
 @test "[SETUP] Harbor" {
     info
     install_harbor(){
-        # Stampa e cattura l'output di kustomize
-        echo "=== Output di kustomize: ==="
-        output=$(kustomize build examples/full-harbor)
-        echo "$output"
-        
-        # Stampa l'output di kubectl apply
-        echo -e "\n=== Output di kubectl apply: ==="
-        echo "$output" | kubectl apply -f - 
+        kustomize build examples/full-harbor | kubectl apply -f - 
     }
     loop_it install_harbor 20 3
     status=${loop_it_result}
