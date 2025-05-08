@@ -121,7 +121,7 @@ steps:
       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.28.0
       # Using nip.io DNS wildcard service to resolve <harbor-domain>.127.0.0.1.nip.io to localhost where Kind exposes services.
       TEST_DOMAIN: "127.0.0.1.nip.io"
-      FURYCTL_VERSION: v0.29.10
+      FURYCTL_VERSION: v0.32.1
     depends_on:
       - create-kind-cluster
     commands:
@@ -251,7 +251,7 @@ steps:
       KUBECONFIG: kubeconfig-harbor-v1.29.0
       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.29.0
       TEST_DOMAIN: "127.0.0.1.nip.io"
-      FURYCTL_VERSION: v0.29.10
+      FURYCTL_VERSION: v0.32.1
     depends_on:
       - create-kind-cluster
     commands:
@@ -381,7 +381,7 @@ steps:
       KUBECONFIG: kubeconfig-harbor-v1.30.4
       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.30.4
       TEST_DOMAIN: "127.0.0.1.nip.io"
-      FURYCTL_VERSION: v0.29.10
+      FURYCTL_VERSION: v0.32.1
     depends_on:
       - create-kind-cluster
     commands:
@@ -511,7 +511,7 @@ steps:
       KUBECONFIG: kubeconfig-harbor-v1.31.0
       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.31.0
       TEST_DOMAIN: "127.0.0.1.nip.io"
-      FURYCTL_VERSION: v0.29.10
+      FURYCTL_VERSION: v0.32.1
     depends_on:
       - create-kind-cluster
     commands:
@@ -641,7 +641,7 @@ steps:
       KUBECONFIG: kubeconfig-harbor-v1.32.0
       CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.32.0
       TEST_DOMAIN: "127.0.0.1.nip.io"
-      FURYCTL_VERSION: v0.29.10
+      FURYCTL_VERSION: v0.32.1
     depends_on:
       - create-kind-cluster
     commands:
