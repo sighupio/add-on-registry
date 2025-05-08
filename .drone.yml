@@ -113,7 +113,7 @@ steps:
       - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
 
   - name: e2e-setup
-    image: quay.io/sighup/e2e-testing:1.1.0_3.12.0_1.29.1_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.29.1_5.6.0_4.33.3
     pull: always
     network_mode: host
     environment:
@@ -132,7 +132,7 @@ steps:
       - bats -t katalog/tests/harbor/setup.sh
 
   - name: e2e-vulns
-    image: quay.io/sighup/e2e-testing:1.1.0_3.12.0_1.29.1_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.29.1_5.6.0_4.33.3
     pull: always
     network_mode: host
     environment:
@@ -146,7 +146,7 @@ steps:
       - bats -t katalog/tests/harbor/vulns.sh
 
   - name: e2e-replication
-    image: quay.io/sighup/e2e-testing:1.1.0_3.12.0_1.29.1_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.29.1_5.6.0_4.33.3
     pull: always
     network_mode: host
     environment:
@@ -160,7 +160,7 @@ steps:
       - bats -t katalog/tests/harbor/replication.sh
 
   - name: e2e-registry
-    image: quay.io/sighup/e2e-testing:1.1.0_3.12.0_1.29.1_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.29.1_5.6.0_4.33.3
     pull: always
     network_mode: host
     volumes:
@@ -244,7 +244,7 @@ steps:
       - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
 
   - name: e2e-setup
-    image: quay.io/sighup/e2e-testing:1.1.0_3.12.0_1.29.1_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.29.1_5.6.0_4.33.3
     pull: always
     network_mode: host
     environment:
@@ -262,7 +262,7 @@ steps:
       - bats -t katalog/tests/harbor/setup.sh
 
   - name: e2e-vulns
-    image: quay.io/sighup/e2e-testing:1.1.0_3.12.0_1.29.1_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.29.1_5.6.0_4.33.3
     pull: always
     network_mode: host
     environment:
@@ -276,7 +276,7 @@ steps:
       - bats -t katalog/tests/harbor/vulns.sh
 
   - name: e2e-replication
-    image: quay.io/sighup/e2e-testing:1.1.0_3.12.0_1.29.1_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.29.1_5.6.0_4.33.3
     pull: always
     network_mode: host
     environment:
@@ -290,7 +290,7 @@ steps:
       - bats -t katalog/tests/harbor/replication.sh
 
   - name: e2e-registry
-    image: quay.io/sighup/e2e-testing:1.1.0_3.12.0_1.29.1_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.29.1_5.6.0_4.33.3
     pull: always
     network_mode: host
     volumes:
