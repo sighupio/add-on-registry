@@ -64,10 +64,7 @@ steps:
       - render
     commands:
       # Using --ignore-deprecations because we don't want the CI to fail when the API has not been removed yet.
-      - /pluto detect distribution.yml --ignore-deprecations --target-versions=k8s=v1.28.0
-      - /pluto detect distribution.yml --ignore-deprecations --target-versions=k8s=v1.29.0
-      - /pluto detect distribution.yml --ignore-deprecations --target-versions=k8s=v1.30.0
-      - /pluto detect distribution.yml --ignore-deprecations --target-versions=k8s=v1.31.0
+      - /pluto detect distribution.yml --ignore-deprecations --target-versions=k8s=v1.32.0
 
 ---
 name: e2e-kubernetes-1.28
@@ -739,6 +736,8 @@ trigger:
   ref:
     include:
       - refs/tags/**
+    exclude:
+      - refs/tags/e2e-**
 
 steps:
   - name: prepare-tar-gz
