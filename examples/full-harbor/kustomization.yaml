@@ -20,7 +20,7 @@ configMapGenerator:
       - POSTGRESQL_USERNAME=postgres
       - POSTGRESQL_DATABASE=registry
       - POSTGRESQL_SSLMODE=disable
-      - EXT_ENDPOINT=https://harbor.kriive.wtf
+      - EXT_ENDPOINT=https://harbor.%YOUR_DOMAIN%:%YOUR_PORT%
       - LOG_LEVEL=debug
       - _REDIS_URL=redis:6379
       - _REDIS_URL_REG=redis://redis:6379/2
@@ -73,6 +73,7 @@ secretGenerator:
     behavior: merge
     literals:
       - secret=Gx6IsNtY4NdWoK0u
+    # Registry overwritable configuration
   - name: registry
     behavior: merge
     literals:
