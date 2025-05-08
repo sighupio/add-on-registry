@@ -97,7 +97,7 @@ steps:
       - sh ./katalog/tests/harbor/config/generate-template.sh v1.28.0
 
   - name: create-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.20.0_1.29.1_3.10.0
+    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
     pull: always
     depends_on:
       - clone
@@ -177,7 +177,7 @@ steps:
       - bats -t katalog/tests/harbor/registry.sh
 
   - name: delete-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.20.0_1.29.1_3.10.0
+    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
@@ -228,7 +228,7 @@ steps:
       - sh ./katalog/tests/harbor/config/generate-template.sh v1.29.0
 
   - name: create-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.20.0_1.29.1_3.10.0
+    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
     pull: always
     depends_on:
       - clone
@@ -307,7 +307,7 @@ steps:
       - bats -t katalog/tests/harbor/registry.sh
 
   - name: delete-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.20.0_1.29.1_3.10.0
+    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
@@ -358,7 +358,7 @@ steps:
       - sh ./katalog/tests/harbor/config/generate-template.sh v1.30.4
 
   - name: create-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.20.0_1.30.5_3.10.0
+    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
     pull: always
     depends_on:
       - clone
@@ -374,7 +374,7 @@ steps:
       - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
 
   - name: e2e-setup
-    image: quay.io/sighup/e2e-testing:1.1.0_3.12.0_1.30.5_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.30.5_5.6.0_4.33.3
     pull: always
     network_mode: host
     environment:
@@ -392,7 +392,7 @@ steps:
       - bats -t katalog/tests/harbor/setup.sh
 
   - name: e2e-vulns
-    image: quay.io/sighup/e2e-testing:1.1.0_3.12.0_1.30.5_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.30.5_5.6.0_4.33.3
     pull: always
     network_mode: host
     environment:
@@ -406,7 +406,7 @@ steps:
       - bats -t katalog/tests/harbor/vulns.sh
 
   - name: e2e-replication
-    image: quay.io/sighup/e2e-testing:1.1.0_3.12.0_1.30.5_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.30.5_5.6.0_4.33.3
     pull: always
     network_mode: host
     environment:
@@ -420,7 +420,7 @@ steps:
       - bats -t katalog/tests/harbor/replication.sh
 
   - name: e2e-registry
-    image: quay.io/sighup/e2e-testing:1.1.0_3.12.0_1.30.5_3.10.0_4.33.3
+    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.30.5_5.6.0_4.33.3
     pull: always
     network_mode: host
     volumes:
@@ -437,7 +437,7 @@ steps:
       - bats -t katalog/tests/harbor/registry.sh
 
   - name: delete-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.20.0_1.30.5_3.10.0
+    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
@@ -488,7 +488,7 @@ steps:
       - sh ./katalog/tests/harbor/config/generate-template.sh v1.31.0
 
   - name: create-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.24.0_1.31.1_5.6.0
+    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
     pull: always
     depends_on:
       - clone
@@ -567,7 +567,7 @@ steps:
       - bats -t katalog/tests/harbor/registry.sh
 
   - name: delete-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.24.0_1.31.1_5.6.0
+    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
