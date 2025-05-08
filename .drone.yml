@@ -519,7 +519,7 @@ steps:
       - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-$(uname -s)-amd64.tar.gz" -o /tmp/furyctl.tar.gz && tar xfz /tmp/furyctl.tar.gz -C /tmp
       - mv /tmp/furyctl /usr/local/bin/furyctl && chmod +x /usr/local/bin/furyctl
       - until kubectl get serviceaccount default > /dev/null 2>&1; do echo "waiting for control-plane" && sleep 1; done
-      - bats --verbose-run -t katalog/tests/harbor/setup.sh
+      - bats -t katalog/tests/harbor/setup.sh
 
   - name: e2e-vulns
     image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
@@ -533,7 +533,7 @@ steps:
       - e2e-setup
     commands:
       - . ./env-$${CLUSTER_NAME}.env
-      - bats --verbose-run -t katalog/tests/harbor/vulns.sh
+      - bats -t katalog/tests/harbor/vulns.sh
 
   - name: e2e-replication
     image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
@@ -547,7 +547,7 @@ steps:
       - e2e-setup
     commands:
       - . ./env-$${CLUSTER_NAME}.env
-      - bats --verbose-run -t katalog/tests/harbor/replication.sh
+      - bats -t katalog/tests/harbor/replication.sh
 
   - name: e2e-registry
     image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
@@ -564,7 +564,7 @@ steps:
       - e2e-setup
     commands:
       - . ./env-$${CLUSTER_NAME}.env
-      - bats --verbose-run -t katalog/tests/harbor/registry.sh
+      - bats -t katalog/tests/harbor/registry.sh
 
   - name: delete-kind-cluster
     image: quay.io/sighup/dind-kind-kubectl-kustomize:0.24.0_1.31.1_5.6.0
