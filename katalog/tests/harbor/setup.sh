@@ -57,7 +57,6 @@ load "./../lib/helper"
     files_to_change="""
     examples/full-harbor/kustomization.yaml
     examples/full-harbor/patch/ingress.yml
-    examples/full-harbor/secrets/notary/server.json
     """
     for file in ${files_to_change}
     do

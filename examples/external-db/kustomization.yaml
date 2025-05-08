@@ -11,14 +11,6 @@ bases:
   - ../../katalog/harbor/distributions/full-harbor
 
 configMapGenerator:
-    # ChartMuseum overwritable configuration
-  - name: chartmuseum
-    behavior: merge
-    literals:
-      - CACHE_REDIS_ADDR=redis:6379
-      - CACHE_REDIS_DB=3
-      - BASIC_AUTH_USER=chart_controller
-      - DEBUG=false
     # Clair overwritable configuration
   - name: clair
     behavior: merge
@@ -65,11 +57,6 @@ configMapGenerator:
       - ctl-config.yml=config/registry/ctl-config.yml
 
 secretGenerator:
-    # ChartMuseum overwritable configuration
-  - name: chartmuseum
-    behavior: merge
-    literals:
-      - CACHE_REDIS_PASSWORD=""
     # Clair overwritable configuration
   - name: clair
     behavior: merge
@@ -92,19 +79,6 @@ secretGenerator:
     behavior: merge
     literals:
       - secret=Gx6IsNtY4NdWoK0u
-    # Notary overwritable configuration
-  - name: notary-server
-    behavior: merge
-    files:
-      - server.json=secrets/notary/server.json
-    literals:
-      - DB_URL=postgres://%YOUR_DB_USER%:%YOUR_DB_PASSWORD%@%YOUR_DB_HOSTNAME%:%YOUR_DB_PORT%/notaryserver?sslmode=disable
-  - name: notary-signer
-    behavior: merge
-    files:
-      - signer.json=secrets/notary/signer.json
-    literals:
-      - DB_URL=postgres://%YOUR_DB_USER%:%YOUR_DB_PASSWORD%@%YOUR_DB_HOSTNAME%:%YOUR_DB_PORT%/notarysigner?sslmode=disable
     # Registry overwritable configuration
   - name: registry
     behavior: merge
@@ -113,12 +87,6 @@ secretGenerator:
       - REGISTRY_REDIS_PASSWORD=""
 
 patchesJson6902:
-  - target:
-      group: ""
-      version: v1
-      kind: PersistentVolumeClaim
-      name: pvc-chartmuseum
-    path: patch/chartmuseum.yml
   - target:
       group: apps
       version: v1

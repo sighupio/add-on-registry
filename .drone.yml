@@ -145,20 +145,6 @@ steps:
       - . ./env-$${CLUSTER_NAME}.env
       - bats -t katalog/tests/harbor/vulns.sh
 
-  - name: e2e-chartmuseum
-    image: quay.io/sighup/e2e-testing:1.1.0_3.12.0_1.29.1_3.10.0_4.33.3
-    pull: always
-    network_mode: host
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.28.0
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.28.0
-      TEST_DOMAIN: "127.0.0.1.nip.io"
-    depends_on:
-      - e2e-setup
-    commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - bats -t katalog/tests/harbor/chartmuseum.sh
-
   - name: e2e-replication
     image: quay.io/sighup/e2e-testing:1.1.0_3.12.0_1.29.1_3.10.0_4.33.3
     pull: always
@@ -189,7 +175,6 @@ steps:
     commands:
       - . ./env-$${CLUSTER_NAME}.env
       - bats -t katalog/tests/harbor/registry.sh
-      - bats -t katalog/tests/harbor/registry-notary.sh
 
   - name: delete-kind-cluster
     image: quay.io/sighup/dind-kind-kubectl-kustomize:0.20.0_1.29.1_3.10.0
@@ -202,7 +187,6 @@ steps:
       - kind delete cluster --name $${CLUSTER_NAME} || true
     depends_on:
       - e2e-vulns
-      - e2e-chartmuseum
       - e2e-replication
       - e2e-registry
     when:
@@ -291,20 +275,6 @@ steps:
       - . ./env-$${CLUSTER_NAME}.env
       - bats -t katalog/tests/harbor/vulns.sh
 
-  - name: e2e-chartmuseum
-    image: quay.io/sighup/e2e-testing:1.1.0_3.12.0_1.29.1_3.10.0_4.33.3
-    pull: always
-    network_mode: host
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.29.0
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.29.0
-      TEST_DOMAIN: "127.0.0.1.nip.io"
-    depends_on:
-      - e2e-setup
-    commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - bats -t katalog/tests/harbor/chartmuseum.sh
-
   - name: e2e-replication
     image: quay.io/sighup/e2e-testing:1.1.0_3.12.0_1.29.1_3.10.0_4.33.3
     pull: always
@@ -335,7 +305,6 @@ steps:
     commands:
       - . ./env-$${CLUSTER_NAME}.env
       - bats -t katalog/tests/harbor/registry.sh
-      - bats -t katalog/tests/harbor/registry-notary.sh
 
   - name: delete-kind-cluster
     image: quay.io/sighup/dind-kind-kubectl-kustomize:0.20.0_1.29.1_3.10.0
@@ -348,7 +317,6 @@ steps:
       - kind delete cluster --name $${CLUSTER_NAME} || true
     depends_on:
       - e2e-vulns
-      - e2e-chartmuseum
       - e2e-replication
       - e2e-registry
     when:
@@ -437,20 +405,6 @@ steps:
       - . ./env-$${CLUSTER_NAME}.env
       - bats -t katalog/tests/harbor/vulns.sh
 
-  - name: e2e-chartmuseum
-    image: quay.io/sighup/e2e-testing:1.1.0_3.12.0_1.30.5_3.10.0_4.33.3
-    pull: always
-    network_mode: host
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.30.4
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.30.4
-      TEST_DOMAIN: "127.0.0.1.nip.io"
-    depends_on:
-      - e2e-setup
-    commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - bats -t katalog/tests/harbor/chartmuseum.sh
-
   - name: e2e-replication
     image: quay.io/sighup/e2e-testing:1.1.0_3.12.0_1.30.5_3.10.0_4.33.3
     pull: always
@@ -481,7 +435,6 @@ steps:
     commands:
       - . ./env-$${CLUSTER_NAME}.env
       - bats -t katalog/tests/harbor/registry.sh
-      - bats -t katalog/tests/harbor/registry-notary.sh
 
   - name: delete-kind-cluster
     image: quay.io/sighup/dind-kind-kubectl-kustomize:0.20.0_1.30.5_3.10.0
@@ -494,7 +447,6 @@ steps:
       - kind delete cluster --name $${CLUSTER_NAME} || true
     depends_on:
       - e2e-vulns
-      - e2e-chartmuseum
       - e2e-replication
       - e2e-registry
     when:
@@ -583,20 +535,6 @@ steps:
       - . ./env-$${CLUSTER_NAME}.env
       - bats -t katalog/tests/harbor/vulns.sh
 
-  - name: e2e-chartmuseum
-    image: quay.io/sighup/e2e-testing:1.1.0_3.12.0_1.31.1_3.10.0_4.33.3
-    pull: always
-    network_mode: host
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.31.0
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.31.0
-      TEST_DOMAIN: "127.0.0.1.nip.io"
-    depends_on:
-      - e2e-setup
-    commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - bats -t katalog/tests/harbor/chartmuseum.sh
-
   - name: e2e-replication
     image: quay.io/sighup/e2e-testing:1.1.0_3.12.0_1.31.1_3.10.0_4.33.3
     pull: always
@@ -627,7 +565,6 @@ steps:
     commands:
       - . ./env-$${CLUSTER_NAME}.env
       - bats -t katalog/tests/harbor/registry.sh
-      - bats -t katalog/tests/harbor/registry-notary.sh
 
   - name: delete-kind-cluster
     image: quay.io/sighup/dind-kind-kubectl-kustomize:0.24.0_1.31.1_3.10.0
@@ -640,7 +577,6 @@ steps:
       - kind delete cluster --name $${CLUSTER_NAME} || true
     depends_on:
       - e2e-vulns
-      - e2e-chartmuseum
       - e2e-replication
       - e2e-registry
     when:
