@@ -9,5 +9,12 @@ kind: Kustomization
 namespace: registry
 
 resources:
-  - ../common
-  - ../../database
+  - ../../trivy
+  - ../../core
+  - ../../jobservice
+  - ../../portal
+  - ../../redis
+  - ../../registry
+  - ../../exporter
+  - ingress.yml
+  - ns.yaml

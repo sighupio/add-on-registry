@@ -12,14 +12,14 @@ metadata:
     component: jobservice
 spec:
   ports:
-  - name: http-jobservice
-    port: 80
-    protocol: TCP
-    targetPort: 8080
-  - name: http-metrics
-    port: 8001
-    protocol: TCP
-    targetPort: 8001
+    - name: http-jobservice
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+    - name: http-metrics
+      port: 8001
+      protocol: TCP
+      targetPort: 8001
   selector:
     app: harbor
     component: jobservice

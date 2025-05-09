@@ -8,17 +8,5 @@ kind: Kustomization
 
 namespace: registry
 
-bases:
-  - ../../chartmuseum
-  - ../../trivy
-  - ../../core
-  - ../../notary
-  - ../../jobservice
-  - ../../portal
-  - ../../redis
-  - ../../registry
-  - ../../exporter
-  
 resources:
-  - ingress.yml
-  - ns.yml
+  - ../common

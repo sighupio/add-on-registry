@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
----
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: registry
@@ -13,21 +12,15 @@ resources:
   - rbac.yml
   - cronjob.yml
 
-commonLabels:
-  app: harbor
-  component: trivy
-
 images:
   - name: goharbor/trivy-adapter-photon
     newName: registry.sighup.io/fury/goharbor/trivy-adapter-photon-offline
-    newTag: v2.7.0
-
-  - name: registry.sighup.io/fury/kubectl
-    newTag: v1.22.0
+    newTag: v2.9.5
+  - name: registry.sighup.io/fury/bitnami/kubectl
+    newTag: "1.30.2"
 
 configMapGenerator:
-  - name: trivy
-    literals:
+  - literals:
       - HTTP_PROXY=""
       - HTTPS_PROXY=""
       - NO_PROXY="core,jobservice,database,chartmuseum,trivy,notary-server,notary-signer,registry,portal,exporter,127.0.0.1,localhost,.local,.internal"
@@ -44,11 +37,17 @@ configMapGenerator:
       - SCANNER_TRIVY_TIMEOUT="5m0s"
       - SCANNER_TRIVY_SECURITY_CHECKS="vuln"
       - SCANNER_TRIVY_OFFLINE_SCAN="true"
+    name: trivy
 
 secretGenerator:
-  - name: trivy
-    literals:
+  - literals:
       - SCANNER_TRIVY_GITHUB_TOKEN=""
       - SCANNER_REDIS_URL="redis://redis:6379/5?idle_timeout_seconds=30"
       - SCANNER_STORE_REDIS_URL="redis://redis:6379/5?idle_timeout_seconds=30"
       - SCANNER_JOB_QUEUE_REDIS_URL="redis://redis:6379/5?idle_timeout_seconds=30"
+    name: trivy
+labels:
+  - includeSelectors: true
+    pairs:
+      app: harbor
+      component: trivy

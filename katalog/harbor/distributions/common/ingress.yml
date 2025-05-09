@@ -17,10 +17,9 @@ metadata:
     cert-manager.io/cluster-issuer: "letsencrypt-staging"
 spec:
   tls:
-  - hosts:
-    - core.harbor.domain
-    - notary.harbor.domain
-    secretName: harbor-ingress-cert
+    - secretName: harbor-ingress-cert
+      hosts:
+        - core.harbor.domain
   rules:
     - http:
         paths:
@@ -67,13 +66,3 @@ spec:
                 port:
                   name: http-web
       host: core.harbor.domain
-    - http:
-        paths:
-        - path: /
-          pathType: Prefix
-          backend:
-            service:
-              name: notary-server
-              port:
-                number: 4443
-      host: notary.harbor.domain

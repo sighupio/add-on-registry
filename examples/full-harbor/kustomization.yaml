@@ -6,19 +6,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: registry
 
-bases:
+resources:
   - ../../katalog/harbor/distributions/full-harbor
 
 configMapGenerator:
-    # ChartMuseum overwritable configuration
-  - name: chartmuseum
-    behavior: merge
-    literals:
-      - CACHE_REDIS_ADDR=redis:6379
-      - CACHE_REDIS_DB=3
-      - BASIC_AUTH_USER=chart_controller
-      - DEBUG=false
-    # Core overwritable configuration
+  # Core overwritable configuration
   - name: core
     behavior: merge
     files:
@@ -63,17 +55,12 @@ configMapGenerator:
       - SCANNER_TRIVY_IGNORE_UNFIXED="false"
 
 secretGenerator:
-    # ChartMuseum overwritable configuration
-  - name: chartmuseum
-    behavior: merge
-    literals:
-      - CACHE_REDIS_PASSWORD=""
-    # Core overwritable configuration
+  # Core overwritable configuration
   - name: core
     behavior: merge
     literals:
       - secretKey=not-a-secure-key
-      - secret=P447FhxLeLwjDMYU 
+      - secret=P447FhxLeLwjDMYU
       - HARBOR_ADMIN_PASSWORD=Harbor12345
       - POSTGRESQL_PASSWORD=changeit
     # Database overwritable configuration
@@ -87,19 +74,6 @@ secretGenerator:
     behavior: merge
     literals:
       - secret=Gx6IsNtY4NdWoK0u
-    # Notary overwritable configuration
-  - name: notary-server
-    behavior: merge
-    files:
-      - server.json=secrets/notary/server.json
-    literals:
-      - DB_URL=postgres://postgres:changeit@database:5432/notaryserver?sslmode=disable
-  - name: notary-signer
-    behavior: merge
-    files:
-      - signer.json=secrets/notary/signer.json
-    literals:
-      - DB_URL=postgres://postgres:changeit@database:5432/notarysigner?sslmode=disable
     # Registry overwritable configuration
   - name: registry
     behavior: merge
@@ -112,13 +86,7 @@ secretGenerator:
     literals:
       - SCANNER_TRIVY_GITHUB_TOKEN=
 
-patchesJson6902:
-  - target:
-      group: ""
-      version: v1
-      kind: PersistentVolumeClaim
-      name: pvc-chartmuseum
-    path: patch/chartmuseum.yml
+patches:
   - target:
       group: apps
       version: v1

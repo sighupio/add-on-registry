@@ -10,6 +10,7 @@ metadata:
   labels:
     app: harbor
     component: core
+    app.kubernetes.io/component: core
 spec:
   replicas: 1
   selector:
@@ -31,17 +32,28 @@ spec:
         - name: core
           image: goharbor/harbor-core
           imagePullPolicy: Always
+          startupProbe:
+            httpGet:
+              path: /api/v2.0/ping
+              scheme: HTTP
+              port: 8080
+            failureThreshold: 360
+            initialDelaySeconds: 10
+            periodSeconds: 10
           livenessProbe:
             httpGet:
-              path: api/v2.0/ping
+              path: /api/v2.0/ping
+              scheme: HTTP
               port: 8080
-            initialDelaySeconds: 300
+            failureThreshold: 2
             periodSeconds: 10
           readinessProbe:
             httpGet:
-              path: api/v2.0/ping
+              path: /api/v2.0/ping
+              scheme: HTTP
               port: 8080
             initialDelaySeconds: 20
+            failureThreshold: 2
             periodSeconds: 10
           resources:
             requests:
@@ -75,8 +87,8 @@ spec:
             - name: token-service-private-key
               mountPath: /etc/core/private_key.pem
               subPath: tls.key
-            - mountPath: /etc/core/ca
-              name: ca-download
+            - name: ca-download
+              mountPath: /etc/core/ca
             - name: psc
               mountPath: /etc/core/token
       volumes:

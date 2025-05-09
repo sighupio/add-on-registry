@@ -15,7 +15,7 @@ resources:
 images:
   - name: goharbor/harbor-core
     newName: registry.sighup.io/fury/goharbor/harbor-core
-    newTag: v2.7.0
+    newTag: v2.9.5
 
 configMapGenerator:
   - name: core
@@ -28,23 +28,17 @@ configMapGenerator:
       - POSTGRESQL_USERNAME=postgres
       - POSTGRESQL_DATABASE=registry
       - POSTGRESQL_SSLMODE=disable
-      - POSTGRESQL_MAX_IDLE_CONNS=50
-      - POSTGRESQL_MAX_OPEN_CONNS=100
+      - POSTGRESQL_MAX_IDLE_CONNS=100
+      - POSTGRESQL_MAX_OPEN_CONNS=900
       - EXT_ENDPOINT=https://core.harbor.domain
       - CORE_URL=http://core
       - JOBSERVICE_URL=http://jobservice
       - REGISTRY_URL=http://registry:5000
       - TOKEN_SERVICE_URL=http://core/service/token
-      - WITH_NOTARY=true
-      - NOTARY_URL=http://notary-server:4443
       - CORE_LOCAL_URL=http://127.0.0.1:8080
       - WITH_TRIVY=true
       - TRIVY_ADAPTER_URL=http://trivy:8080
-      - CFG_EXPIRATION=5
-      - ADMIRAL_URL=NA
       - REGISTRY_STORAGE_PROVIDER_NAME=filesystem
-      - WITH_CHARTMUSEUM=true
-      - CHART_REPOSITORY_URL=http://chartmuseum
       - LOG_LEVEL=info
       - CONFIG_PATH=/etc/core/app.conf
       - CHART_CACHE_DRIVER=redis
@@ -52,8 +46,8 @@ configMapGenerator:
       - _REDIS_URL_REG="redis://redis:6379/2?idle_timeout_seconds=30"
       - PORT=8080
       - PORTAL_URL=http://portal
-      - REGISTRYCTL_URL=http://registry:8080
       - REGISTRY_CONTROLLER_URL=http://registry:8080
+      - REGISTRY_CREDENTIAL_USERNAME=harbor_registry_user
       - METRIC_ENABLE=true
       - METRIC_NAMESPACE=harbor
       - METRIC_PATH=/metrics
@@ -63,6 +57,7 @@ configMapGenerator:
       - HTTPS_PROXY=
       - NO_PROXY=core,jobservice,database,chartmuseum,trivy,notary-server,notary-signer,registry,portal,exporter,127.0.0.1,localhost,.local,.internal
       - PERMITTED_REGISTRY_TYPES_FOR_PROXY_CACHE=docker-hub,harbor,azure-acr,aws-ecr,google-gcr,quay,docker-registry,jfrog-artifactory
+      - QUOTA_UPDATE_PROVIDER=db
 
 secretGenerator:
   - name: core
@@ -72,5 +67,4 @@ secretGenerator:
       - HARBOR_ADMIN_PASSWORD=Harbor12345
       - POSTGRESQL_PASSWORD=changeit
       - CSRF_KEY=QQRqXf3yTEtceQDS6NMY9F777LZ4bqKt
-      - REGISTRY_CREDENTIAL_USERNAME=harbor_registry_user
       - REGISTRY_CREDENTIAL_PASSWORD=DhQTxjwUAyUZHaMABvm90dGAJMDX5jaa

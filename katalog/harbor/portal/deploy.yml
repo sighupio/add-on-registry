@@ -49,10 +49,10 @@ spec:
           ports:
             - containerPort: 8080
           volumeMounts:
-          - name: portal-config
-            mountPath: /etc/nginx/nginx.conf
-            subPath: nginx.conf
+            - name: portal-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
       volumes:
-      - name: portal-config
-        configMap:
-          name: portal
+        - name: portal-config
+          configMap:
+            name: portal

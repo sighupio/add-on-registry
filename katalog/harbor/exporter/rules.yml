@@ -11,13 +11,13 @@ metadata:
   name: harbor-rules
 spec:
   groups:
-  - name: harbor-rules
-    rules:
-    - alert: HarborIsDown
-      expr: harbor_up == 0
-      for: 5m
-      labels:
-        severity: critical
-      annotations:
-        summary: The service of Harbor is Down
-        description: Habor service is Down.
+    - name: harbor-rules
+      rules:
+        - alert: HarborIsDown
+          expr: harbor_up == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: The service of Harbor is Down
+            description: Habor service is Down.

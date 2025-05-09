@@ -35,9 +35,13 @@ spec:
         # we may remove it after several releases
         - name: "data-migrator"
           image: goharbor/harbor-db
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           command: ["/bin/sh"]
-          args: ["-c", "[ -e /var/lib/postgresql/data/postgresql.conf ] && [ ! -d /var/lib/postgresql/data/pgdata ] && mkdir -m 0700 /var/lib/postgresql/data/pgdata && mv /var/lib/postgresql/data/* /var/lib/postgresql/data/pgdata/ || true"]
+          args:
+            [
+              "-c",
+              "[ -e /var/lib/postgresql/data/postgresql.conf ] && [ ! -d /var/lib/postgresql/data/pgdata ] && mkdir -m 0700 /var/lib/postgresql/data/pgdata && mv /var/lib/postgresql/data/* /var/lib/postgresql/data/pgdata/ || true",
+            ]
           volumeMounts:
             - name: database
               mountPath: /var/lib/postgresql/data
@@ -48,13 +52,13 @@ spec:
         # as "fsGroup" applied before the init container running, the container has enough permission to execute the command
         - name: "data-permissions-ensurer"
           image: goharbor/harbor-db
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           command: ["/bin/sh"]
           args: ["-c", "chmod -R 700 /var/lib/postgresql/data/pgdata || true"]
           volumeMounts:
             - name: database
               mountPath: /var/lib/postgresql/data
-              subPath: 
+              subPath:
         - name: remove-lost-found
           image: goharbor/harbor-db
           imagePullPolicy: Always
@@ -96,10 +100,10 @@ spec:
             - name: shm-volume
               mountPath: /dev/shm
       volumes:
-      - name: shm-volume
-        emptyDir:
-          medium: Memory
-          sizeLimit: 512Mi
+        - name: shm-volume
+          emptyDir:
+            medium: Memory
+            sizeLimit: 512Mi
   volumeClaimTemplates:
     - metadata:
         name: database

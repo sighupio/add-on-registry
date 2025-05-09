@@ -17,7 +17,7 @@ metadata:
 spec:
   commonName: core
   dnsNames:
-  - core
+    - core
   isCA: true
   issuerRef:
     kind: Issuer
