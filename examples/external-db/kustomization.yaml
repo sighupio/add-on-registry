@@ -8,7 +8,7 @@ kind: Kustomization
 namespace: registry
 
 bases:
-  - ../../katalog/harbor/distributions/full-harbor
+  - ../../katalog/harbor/distributions/harbor-without-psql
 
 configMapGenerator:
   # Core overwritable configuration
