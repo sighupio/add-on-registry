@@ -7,7 +7,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: registry
 
-bases:
+resources:
   - ../../katalog/harbor/distributions/harbor-without-psql
 
 configMapGenerator:
@@ -43,6 +43,13 @@ configMapGenerator:
     files:
       - config.yml=config/registry/config.yml
       - ctl-config.yml=config/registry/ctl-config.yml
+  - name: exporter
+    behavior: merge
+    literals:
+      - HARBOR_DATABASE_HOST=%YOUR_DB_HOSTNAME%
+      - HARBOR_DATABASE_PORT=%YOUR_DB_PORT%
+      - HARBOR_DATABASE_USERNAME=%YOUR_DB_USER%
+      - HARBOR_DATABASE_DBNAME="registry"
 
 secretGenerator:
   # Core overwritable configuration
@@ -64,8 +71,12 @@ secretGenerator:
     literals:
       - REGISTRY_HTTP_SECRET=Z6HTqCsLzHMmgr9W
       - REGISTRY_REDIS_PASSWORD=""
+  - name: exporter
+    behavior: merge
+    literals:
+      - HARBOR_DATABASE_PASSWORD="changeit"
 
-patchesJson6902:
+patches:
   - target:
       group: apps
       version: v1
@@ -84,3 +95,24 @@ patchesJson6902:
       kind: Ingress
       name: harbor-ingress
     path: patch/ingress.yml
+  # uncomment the following if you want to add a nodeSelector
+  # - target:
+  #     kind: Deployment|StatefulSet
+  #     name: redis|trivy|core|jobservice|exporter|portal|registry
+  #   patch: |
+  #     - op: add
+  #       path: /spec/template/spec/nodeSelector
+  #       value:
+  #         { %YOUR_LABEL%: %YOUR_VALUE% }
+  # uncomment the following if you want to add tolerations
+  # - target:
+  #     kind: Deployment|StatefulSet
+  #     group: apps
+  #     version: v1
+  #     name: redis|trivy|core|jobservice|exporter|portal|registry
+  #   patch: |
+  #     - op: add
+  #       path: /spec/template/spec/tolerations
+  #       value: [{ key: "%YOUR_TAINT_KEY",
+  #           effect: "%YOUR_TAINT_EFFECT%",
+  #           value: "%YOUR_TAINT_VALUE" }]

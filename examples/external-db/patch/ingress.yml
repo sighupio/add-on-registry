@@ -4,7 +4,7 @@
 
 ---
 - op: add
-  path: "/metadata/annotations/kubernetes.io~1ingress.class"
+  path: "/spec/ingressClassName"
   value: "nginx"
 
 - op: add
