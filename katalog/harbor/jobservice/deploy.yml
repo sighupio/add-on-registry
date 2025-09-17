@@ -32,16 +32,18 @@ spec:
       containers:
         - name: jobservice
           image: goharbor/harbor-jobservice
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
               path: /api/v1/stats
+              scheme: HTTP
               port: 8080
             initialDelaySeconds: 300
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /api/v1/stats
+              scheme: HTTP
               port: 8080
             initialDelaySeconds: 20
             periodSeconds: 10
@@ -65,6 +67,15 @@ spec:
                 secretKeyRef:
                   name: jobservice
                   key: secret
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           ports:
             - containerPort: 8080
           volumeMounts:

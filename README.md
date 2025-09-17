@@ -21,9 +21,9 @@ If you are new to SD please refer to the [official documentation][sd-docs] on ho
 
 Registry Add-On Module provides the following packages:
 
-| Package                  | Version  | Description                                                                                                                                                          |
-| ------------------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Harbor](katalog/harbor) | `v2.9.5` | Harbor is an open-source container image registry that secures images with role-based access control, scans images for vulnerabilities, and signs images as trusted. |
+| Package                  | Version   | Description                                                                                                                                                          |
+| ------------------------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Harbor](katalog/harbor) | `v2.13.2` | Harbor is an open-source container image registry that secures images with role-based access control, scans images for vulnerabilities, and signs images as trusted. |
 
 Click on each package to see its full documentation.
 
@@ -43,9 +43,9 @@ The table shows the latest 5 compatible versions. Check the [compatibility matri
 
 ### Prerequisites
 
-| Tool                        | Version    | Description                                                                                                                                                    |
-| --------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [furyctl][furyctl-repo]     | `>=0.6.0`  | The recommended tool to download and manage SD modules and their packages. To learn more about `furyctl` read the [official documentation][furyctl-repo].     |
+| Tool                        | Version   | Description                                                                                                                                                    |
+| --------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [furyctl][furyctl-repo]     | `>=0.6.0` | The recommended tool to download and manage SD modules and their packages. To learn more about `furyctl` read the [official documentation][furyctl-repo].      |
 | [kustomize][kustomize-repo] | `>=5.6.0` | Packages are customized using `kustomize`. To learn how to create your customization layer with `kustomize`, please refer to the [repository][kustomize-repo]. |
 
 All packages in this repository have the following dependencies, for package specific dependencies, please visit the single package's documentation:
@@ -109,9 +109,7 @@ To see examples on how to customize Registry Add-On Module, please view the [exa
 
 <!-- Links -->
 [harbor-site]: https://goharbor.io/
-[kfd-monitoring]: https://github.com/sighupio/fury-kubernetes-monitoring
 [furyctl-repo]: https://github.com/sighupio/furyctl
-[sighup-page]: https://sighup.io
 [kfd-repo]: https://github.com/sighupio/fury-distribution
 [kustomize-repo]: https://github.com/kubernetes-sigs/kustomize
 [sd-docs]: https://docs.kubernetesfury.com/docs/distribution/

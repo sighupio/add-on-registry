@@ -30,6 +30,7 @@ redis:
   readtimeout: 10s
   writetimeout: 10s
   dialtimeout: 10s
+  enableTLS: false
   pool:
     maxidle: 100
     maxactive: 500

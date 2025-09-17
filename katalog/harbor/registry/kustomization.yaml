@@ -15,10 +15,10 @@ resources:
 images:
   - name: goharbor/registry-photon
     newName: registry.sighup.io/fury/goharbor/registry-photon
-    newTag: v2.9.5
+    newTag: v2.13.2
   - name: goharbor/harbor-registryctl
     newName: registry.sighup.io/fury/goharbor/harbor-registryctl
-    newTag: v2.9.5
+    newTag: v2.13.2
 
 configMapGenerator:
   - name: registry

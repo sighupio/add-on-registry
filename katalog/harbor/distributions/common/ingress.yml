@@ -51,13 +51,6 @@ spec:
                 name: core
                 port:
                   name: http-web
-          - path: /chartrepo/
-            pathType: Prefix
-            backend:
-              service:
-                name: core
-                port:
-                  name: http-web
           - path: /c/
             pathType: Prefix
             backend:

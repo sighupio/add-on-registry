@@ -10,7 +10,7 @@ namespace: registry
 images:
   - name: goharbor/harbor-db
     newName: registry.sighup.io/fury/goharbor/harbor-db
-    newTag: v2.9.5
+    newTag: v2.13.2
 
 resources:
   - sts.yml

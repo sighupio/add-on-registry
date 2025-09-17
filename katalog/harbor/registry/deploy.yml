@@ -33,16 +33,18 @@ spec:
       containers:
         - name: registry
           image: goharbor/registry-photon
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
               path: /
+              scheme: HTTP
               port: 5000
             initialDelaySeconds: 300
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /
+              scheme: HTTP
               port: 5000
             initialDelaySeconds: 1
             periodSeconds: 10
@@ -51,12 +53,21 @@ spec:
               memory: 256Mi
               cpu: 100m
           args: ["serve", "/etc/registry/config.yml"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           envFrom:
             - secretRef:
                 name: registry
           ports:
             - containerPort: 5000
-            - containerPort: 5001
+            - containerPort: 8001
           volumeMounts:
             - name: data
               mountPath: /storage
@@ -68,7 +79,7 @@ spec:
               subPath: passwd
         - name: registryctl
           image: goharbor/harbor-registryctl
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
               path: /api/health
@@ -87,6 +98,15 @@ spec:
             requests:
               memory: 256Mi
               cpu: 100m
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           envFrom:
             - secretRef:
                 name: registry

@@ -16,7 +16,7 @@ resources:
 images:
   - name: goharbor/harbor-jobservice
     newName: registry.sighup.io/fury/goharbor/harbor-jobservice
-    newTag: v2.9.5
+    newTag: v2.13.2
 
 configMapGenerator:
   - name: jobservice
@@ -34,7 +34,7 @@ configMapGenerator:
       - JOBSERVICE_WEBHOOK_JOB_HTTP_CLIENT_TIMEOUT=3
       - HTTP_PROXY=
       - HTTPS_PROXY=
-      - NO_PROXY=core,jobservice,database,chartmuseum,trivy,notary-server,notary-signer,registry,portal,exporter,127.0.0.1,localhost,.local,.internal
+      - NO_PROXY=core,jobservice,database,trivy,registry,portal,exporter,127.0.0.1,localhost,.local,.internal
 
 secretGenerator:
   - name: jobservice

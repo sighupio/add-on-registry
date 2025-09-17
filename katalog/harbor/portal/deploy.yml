@@ -29,20 +29,27 @@ spec:
       containers:
         - name: portal
           image: goharbor/harbor-portal
-          imagePullPolicy: Always
-          resources:
-            requests:
-              memory: 256Mi
-              cpu: 100m
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           livenessProbe:
             httpGet:
               path: /
+              scheme: HTTP
               port: 8080
             initialDelaySeconds: 300
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /
+              scheme: HTTP
               port: 8080
             initialDelaySeconds: 1
             periodSeconds: 10

@@ -32,7 +32,16 @@ spec:
       containers:
         - name: redis
           image: goharbor/redis-photon
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           livenessProbe:
             tcpSocket:
               port: 6379
