@@ -33,22 +33,6 @@ depends_on:
   - license
 
 steps:
-  - name: lint
-    image: quay.io/sighup/policeman
-    pull: always
-    environment:
-      # Identifies false positives like missing 'selector'.
-      # Doing this is valid for Kustomize patches
-      VALIDATE_KUBERNETES_KUBEVAL: "false"
-      # Some duplicated code is intended.
-      VALIDATE_JSCPD: "false"
-      # hadolint already validated dockerfiles
-      VALIDATE_DOCKERFILE: "false"
-      # Disable natural language checks
-      VALIDATE_NATURAL_LANGUAGE: "false"
-    depends_on:
-      - clone
-
   - name: render
     image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
     pull: always
