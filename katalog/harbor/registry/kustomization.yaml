@@ -15,10 +15,10 @@ resources:
 images:
   - name: goharbor/registry-photon
     newName: registry.sighup.io/fury/goharbor/registry-photon
-    newTag: v2.9.5
+    newTag: v2.11.2
   - name: goharbor/harbor-registryctl
     newName: registry.sighup.io/fury/goharbor/harbor-registryctl
-    newTag: v2.9.5
+    newTag: v2.11.2
 
 configMapGenerator:
   - name: registry
@@ -33,3 +33,9 @@ secretGenerator:
     literals:
       - REGISTRY_HTTP_SECRET=Z6HTqCsLzHMmgr9W
       - REGISTRY_REDIS_PASSWORD=""
+
+labels:
+  - includeSelectors: true
+    pairs:
+      app: harbor
+      component: registry

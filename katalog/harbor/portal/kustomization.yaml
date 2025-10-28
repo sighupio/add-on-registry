@@ -10,7 +10,7 @@ namespace: registry
 images:
   - name: goharbor/harbor-portal
     newName: registry.sighup.io/fury/goharbor/harbor-portal
-    newTag: v2.9.5
+    newTag: v2.11.2
 
 resources:
   - deploy.yml
@@ -20,3 +20,9 @@ configMapGenerator:
   - name: portal
     files:
       - nginx.conf=config/nginx.conf
+
+labels:
+  - includeSelectors: true
+    pairs:
+      app: harbor
+      component: portal

@@ -8,21 +8,10 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: redis
-  labels:
-    app: harbor
-    component: redis
 spec:
   replicas: 1
   serviceName: redis
-  selector:
-    matchLabels:
-      app: harbor
-      component: redis
   template:
-    metadata:
-      labels:
-        app: harbor
-        component: redis
     spec:
       securityContext:
         runAsUser: 999
@@ -31,8 +20,17 @@ spec:
       terminationGracePeriodSeconds: 120
       containers:
         - name: redis
-          image: goharbor/redis-photon
+          image: goharbor/redis-photon:v2.11.2
           imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           livenessProbe:
             tcpSocket:
               port: 6379
@@ -53,9 +51,6 @@ spec:
   volumeClaimTemplates:
     - metadata:
         name: data
-        labels:
-          app: harbor
-          component: redis
       spec:
         accessModes: ["ReadWriteOnce"]
         resources:

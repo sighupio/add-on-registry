@@ -18,7 +18,7 @@ helm search repo harbor/harbor --versions
 ```bash
 VERSION=v1.15.2 #v2.11.2
 rm -rf vendor
-helm template harbor harbor/harbor --version $VERSION --set "metrics.enabled=true" --set "metrics.serviceMonitor.enabled=true" --output-dir vendor
+helm template harbor harbor/harbor --version $VERSION -f MAINTENANCE.values.yaml --output-dir vendor
 for file in $(find ./vendor -type f \( -name "*.yaml" -o -name "*.yml" \)); do
   yq -i 'del(.metadata.labels, .spec.selector, .spec.template.metadata)' $file
 done
@@ -30,15 +30,35 @@ At this point you should check the differences and adapt them. Keep in mind that
 
 The Helm chart generates the same foldering that we maintain, so you will need to compare manifests inside each folder.
 
+#### General notes
+
+- we prefer to generate secrets and configmaps using Kustomize generators
+- we delete all labels from the upstream-generated manifests and set them with Kustomize
+- we rewrite all images and tags using Kustomize, pointing to our registry - remember to pull new images!
+
 #### Config maps
 
-We generate CMs sing Kustomize's `configMapGenerator`, so you will need to port all Helm configmaps into each `kustomization.yaml`.
+We generate CMs using Kustomize's `configMapGenerator`, so you will need to port all Helm configmaps into each `kustomization.yaml`.
 
-## Service monitor manifests
+We also prefer to use the `files` options when possible (e.g.: in `portal` the `nginx.conf` is placed inside `config/nginx.conf` and imported in the CM with Kustomize)
+
+### Secrets
+
+- the `JOBSERVICE_SECRET` key has been renamed to `secret` inside the `jobservice` secret
+
+### Service monitor manifests
 
 The service monitor manifests `katalog/harbor/exporter/sm.yml` file will be found at `vendor/metrics/metrics-svcmon.yaml`, as usual check for differences.
 
 Once deployed, you will be able to find a `serviceMonitor` Prometheus Operator resources. It is required to allow prometheus to fetch the metrics exposed by Harbor
+
+### Ingress manifest
+
+The Ingress manifest `katalog/harbor/distributions/common/ingress.yml` will be found at `vendor/ingress/ingress.yaml`, as usual check for differences.
+
+### Jobservice
+
+We add an additional PVC for scan reports, so you will NOT find it in the vendor folder.
 
 ### Demos / Testing
 
@@ -57,7 +77,7 @@ All the following examples are tested in the pipeline
 
 The Grafana dashboard found in `katalog/harbor/exporter/dashboards` was taken from:
 
-- [Harbor Metrics](https://github.com/goharbor/harbor/blob/main/contrib/grafana-dashborad/metrics-example.json)
+- [Harbor Metrics](https://github.com/goharbor/harbor/blob/main/contrib/grafana-dashboard/metrics-example.json)
 
 Compared to the official dashboards, the following changes have been made:
 

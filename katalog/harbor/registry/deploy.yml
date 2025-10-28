@@ -6,23 +6,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: registry
-  labels:
-    app: harbor
-    component: registry
+  name: "registry"
 spec:
   replicas: 1
   strategy:
     type: RollingUpdate
-  selector:
-    matchLabels:
-      app: harbor
-      component: registry
   template:
-    metadata:
-      labels:
-        app: harbor
-        component: registry
     spec:
       securityContext:
         runAsUser: 10000
@@ -32,20 +21,31 @@ spec:
       terminationGracePeriodSeconds: 120
       containers:
         - name: registry
-          image: goharbor/registry-photon
+          image: goharbor/registry-photon:v2.11.2
           imagePullPolicy: Always
           livenessProbe:
             httpGet:
               path: /
+              scheme: HTTP
               port: 5000
             initialDelaySeconds: 300
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /
+              scheme: HTTP
               port: 5000
             initialDelaySeconds: 1
             periodSeconds: 10
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           resources:
             requests:
               memory: 256Mi
@@ -56,18 +56,18 @@ spec:
                 name: registry
           ports:
             - containerPort: 5000
-            - containerPort: 5001
+            - containerPort: 8001
           volumeMounts:
             - name: data
               mountPath: /storage
-            - name: registry-config
-              mountPath: /etc/registry/config.yml
-              subPath: config.yml
             - name: registry-passwd
               mountPath: /etc/registry/passwd
               subPath: passwd
+            - name: registry-config
+              mountPath: /etc/registry/config.yml
+              subPath: config.yml
         - name: registryctl
-          image: goharbor/harbor-registryctl
+          image: goharbor/harbor-registryctl:v2.11.2
           imagePullPolicy: Always
           livenessProbe:
             httpGet:
@@ -83,6 +83,15 @@ spec:
               port: 8080
             initialDelaySeconds: 1
             periodSeconds: 10
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           resources:
             requests:
               memory: 256Mi
