@@ -19,6 +19,9 @@ helm search repo harbor/harbor --versions
 VERSION=v1.15.2 #v2.11.2
 rm -rf vendor
 helm template harbor harbor/harbor --version $VERSION --set "metrics.enabled=true" --set "metrics.serviceMonitor.enabled=true" --output-dir vendor
+for file in $(find ./vendor -type f \( -name "*.yaml" -o -name "*.yml" \)); do
+  yq -i 'del(.metadata.labels, .spec.selector, .spec.template.metadata)' $file
+done
 ```
 
 ### Check the diff and update the images
