@@ -35,6 +35,7 @@ The Helm chart generates the same foldering that we maintain, so you will need t
 - we prefer to generate secrets and configmaps using Kustomize generators
 - we delete all labels from the upstream-generated manifests and set them with Kustomize, with the exception of some CustomResource ( es. ServiceMonitor ) or fields ( volumeClaimTemplates ) 
 - we rewrite all images and tags using Kustomize, pointing to our registry - remember to pull new images!
+- we stripped all of the resources from the Helm Chart's release Name prefix, which is "harbor-" by default ( es. "harbor-core" and "harbor-registry" Deployment and ConfigMap become "core" and "registry" in our manifests ). Remember to change accordingly both the resources' names, and the configurations that reference them!
 
 #### Config maps
 
