@@ -78,3 +78,6 @@ spec:
         - name: job-logs
           persistentVolumeClaim:
             claimName: pvc-jobservice
+        - name: job-scandata-exports
+          persistentVolumeClaim:
+            claimName: pvc-job-scandata-exports
