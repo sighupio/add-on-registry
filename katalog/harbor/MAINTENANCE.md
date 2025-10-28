@@ -33,7 +33,7 @@ The Helm chart generates the same foldering that we maintain, so you will need t
 #### General notes
 
 - we prefer to generate secrets and configmaps using Kustomize generators
-- we delete all labels from the upstream-generated manifests and set them with Kustomize
+- we delete all labels from the upstream-generated manifests and set them with Kustomize, with the exception of some CustomResource ( es. ServiceMonitor ) or fields ( volumeClaimTemplates ) 
 - we rewrite all images and tags using Kustomize, pointing to our registry - remember to pull new images!
 
 #### Config maps

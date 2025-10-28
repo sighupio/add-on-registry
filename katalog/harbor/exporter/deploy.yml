@@ -6,56 +6,51 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    app: harbor
-    component: exporter
   name: exporter
-  namespace: registry
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      app: harbor
-      component: exporter
+  revisionHistoryLimit: 10
   template:
-    metadata:
-      labels:
-        app: harbor
-        component: exporter
     spec:
       securityContext:
         fsGroup: 10000
         runAsUser: 10000
-      terminationGracePeriodSeconds: 30
       automountServiceAccountToken: false
       containers:
         - name: exporter
           image: goharbor/harbor-exporter
           imagePullPolicy: Always
-          args:
-            - -log-level
-            - info
           livenessProbe:
             httpGet:
               path: /
               port: 8001
-              scheme: HTTP
             initialDelaySeconds: 300
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /
               port: 8001
-              scheme: HTTP
             initialDelaySeconds: 30
             periodSeconds: 10
+          args: ["-log-level", "info"]
           envFrom:
             - configMapRef:
                 name: exporter
             - secretRef:
                 name: exporter
+          env:
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           ports:
-            - containerPort: 8080
+            - containerPort: 8001
+          volumeMounts:
       volumes:
         - name: config
           secret:

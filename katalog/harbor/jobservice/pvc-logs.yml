@@ -7,9 +7,6 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: pvc-jobservice
-  labels:
-    app: harbor
-    component: jobservice
 spec:
   accessModes:
     - ReadWriteOnce

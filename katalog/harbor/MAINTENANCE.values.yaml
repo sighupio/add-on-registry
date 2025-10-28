@@ -467,10 +467,10 @@ core:
   startupProbe:
     enabled: true
     initialDelaySeconds: 10
-  # resources:
-  #  requests:
-  #    memory: 256Mi
-  #    cpu: 100m
+  resources:
+   requests:
+     memory: 256Mi
+     cpu: 100m
   extraEnvVars: []
   nodeSelector: {}
   tolerations: []
@@ -550,10 +550,10 @@ jobservice:
   automountServiceAccountToken: false
   replicas: 1
   revisionHistoryLimit: 10
-  # resources:
-  #   requests:
-  #     memory: 256Mi
-  #     cpu: 100m
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
   extraEnvVars: []
   nodeSelector: {}
   tolerations: []
@@ -793,10 +793,10 @@ database:
     serviceAccountName: ""
     # mount the service account token
     automountServiceAccountToken: false
-    # resources:
-    #  requests:
-    #    memory: 256Mi
-    #    cpu: 100m
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
     # The timeout used in livenessProbe; 1 to 5 seconds
     livenessProbe:
       timeoutSeconds: 1

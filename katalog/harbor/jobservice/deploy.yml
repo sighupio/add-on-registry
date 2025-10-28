@@ -7,22 +7,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: jobservice
-  labels:
-    app: harbor
-    component: jobservice
 spec:
   replicas: 1
+  revisionHistoryLimit: 10
   strategy:
     type: RollingUpdate
-  selector:
-    matchLabels:
-      app: harbor
-      component: jobservice
   template:
-    metadata:
-      labels:
-        app: harbor
-        component: jobservice
     spec:
       securityContext:
         runAsUser: 10000
@@ -36,12 +26,14 @@ spec:
           livenessProbe:
             httpGet:
               path: /api/v1/stats
+              scheme: HTTP
               port: 8080
             initialDelaySeconds: 300
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /api/v1/stats
+              scheme: HTTP
               port: 8080
             initialDelaySeconds: 20
             periodSeconds: 10
@@ -60,11 +52,15 @@ spec:
                 secretKeyRef:
                   name: core
                   key: secret
-            - name: JOBSERVICE_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: jobservice
-                  key: secret
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           ports:
             - containerPort: 8080
           volumeMounts:
@@ -82,6 +78,3 @@ spec:
         - name: job-logs
           persistentVolumeClaim:
             claimName: pvc-jobservice
-        - name: job-scandata-exports
-          persistentVolumeClaim:
-            claimName: pvc-job-scandata-exports
