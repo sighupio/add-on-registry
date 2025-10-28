@@ -19,7 +19,7 @@ spec:
       terminationGracePeriodSeconds: 120
       containers:
         - name: core
-          image: goharbor/harbor-core
+          image: goharbor/harbor-core:v2.11.2
           imagePullPolicy: Always
           startupProbe:
             httpGet:

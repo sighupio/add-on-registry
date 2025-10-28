@@ -21,7 +21,7 @@ spec:
       terminationGracePeriodSeconds: 120
       containers:
         - name: jobservice
-          image: goharbor/harbor-jobservice
+          image: goharbor/harbor-jobservice:v2.11.2
           imagePullPolicy: Always
           livenessProbe:
             httpGet:
