@@ -39,18 +39,18 @@ spec:
             periodSeconds: 10
           resources:
             requests:
-              memory: 256Mi
               cpu: 100m
-          envFrom:
-            - configMapRef:
-                name: jobservice
-            - secretRef:
-                name: jobservice
+              memory: 256Mi
           env:
             - name: CORE_SECRET
               valueFrom:
                 secretKeyRef:
                   name: core
+                  key: secret
+            - name: JOBSERVICE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jobservice
                   key: secret
           securityContext:
             allowPrivilegeEscalation: false
@@ -61,6 +61,11 @@ spec:
             runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
+          envFrom:
+            - configMapRef:
+                name: jobservice
+            - secretRef:
+                name: jobservice
           ports:
             - containerPort: 8080
           volumeMounts:
