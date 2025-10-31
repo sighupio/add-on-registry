@@ -4,10 +4,6 @@
 
 ---
 - op: add
-  path: "/metadata/annotations/kubernetes.io~1ingress.class"
-  value: "nginx"
-
-- op: add
   path: "/metadata/annotations/forecastle.stakater.com~1expose"
   value: "true"
 
@@ -21,11 +17,11 @@
 
 - op: replace
   path: /spec/rules/0/host
-  value: harbor.%YOUR_DOMAIN%
+  value: %YOUR_INGRESS_HOST%
 
 - op: replace
   path: /spec/tls/0/hosts/0
-  value: harbor.%YOUR_DOMAIN%
+  value: %YOUR_INGRESS_HOST%
 
 - op: replace
   path: "/metadata/annotations/cert-manager.io~1cluster-issuer"

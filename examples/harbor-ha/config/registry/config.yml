@@ -24,9 +24,9 @@ storage:
   redirect:
     disable: false
 redis:
-  addr: "redis:6379"
+  addr: "%YOUR_REDIS_HOSTS%"
+  sentinelMasterSet: "%YOUR_REDIS_MASTER_SET%"
   db: 2
-  password:
   readtimeout: 10s
   writetimeout: 10s
   dialtimeout: 10s

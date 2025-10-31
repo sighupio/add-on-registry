@@ -8,3 +8,4 @@ We are evaluating the re-write from scratch of a few simple PrometheusRules, tha
 The generated secret seems to be used as a volume in the same spot where upstream configures an Ingress-related TLS certificate, but that is unlikely to work in the add-on configuration.
 We might want to test wether this PKI is actually used, possibly by testing that the whole deployment keeps working even if the PKI-related secrets get deleted. 
 
+3. We opened an issue upstream about Redis Sentinel connectivity: https://github.com/goharbor/harbor/issues/22538

@@ -20,14 +20,20 @@ configMapGenerator:
       - POSTGRESQL_HOST=%YOUR_DB_HOSTNAME%
       - POSTGRESQL_PORT=%YOUR_DB_PORT%
       - POSTGRESQL_USERNAME=%YOUR_DB_USER%
-      - POSTGRESQL_DATABASE=registry
+      - POSTGRESQL_DATABASE=%YOUR_DB_NAME%
       - POSTGRESQL_SSLMODE=disable
-      - EXT_ENDPOINT=https://harbor.%YOUR_DOMAIN%:%YOUR_PORT%
+      - EXT_ENDPOINT=%YOUR_INGRESS_HOST%
       - LOG_LEVEL=info
-      - _REDIS_URL=redis:6379
-      - _REDIS_URL_REG=redis://redis:6379/2
+      - _REDIS_URL_CORE="%YOUR_REDIS_SCHEME%://%YOUR_REDIS_PASSWORD%@%YOUR_REDIS_HOSTS%/0?idle_timeout_seconds=30"
+      - _REDIS_URL_REG="%YOUR_REDIS_SCHEME%://%YOUR_REDIS_PASSWORD%@%YOUR_REDIS_HOSTS%/2?idle_timeout_seconds=30"
       - HTTP_PROXY=
       - HTTPS_PROXY=
+
+  # Exporter overwritable configuration
+  - name: exporter
+    behavior: merge
+    literals:
+      - HARBOR_REDIS_URL=%YOUR_REDIS_SCHEME%://%YOUR_REDIS_PASSWORD%@%YOUR_REDIS_HOSTS%/redisMaster/1
     # JobService overwritable configuration
   - name: jobservice
     behavior: merge
@@ -51,8 +57,8 @@ secretGenerator:
     literals:
       - secretKey=not-a-secure-key
       - secret=P447FhxLeLwjDMYU
-      - HARBOR_ADMIN_PASSWORD=Harbor12345
-      - POSTGRESQL_PASSWORD=changeit
+      - HARBOR_ADMIN_PASSWORD=%HARBOR_ADMIN_PASSWORD%
+      - POSTGRESQL_PASSWORD=%YOUR_DB_PASSWORD%
     # JobService overwritable configuration
   - name: jobservice
     behavior: merge
@@ -63,7 +69,13 @@ secretGenerator:
     behavior: merge
     literals:
       - REGISTRY_HTTP_SECRET=Z6HTqCsLzHMmgr9W
-      - REGISTRY_REDIS_PASSWORD=""
+      - REGISTRY_REDIS_PASSWORD="%YOUR_REDIS_PASSWORD%"
+  - name: trivy
+    behavior: merge
+    literals:
+      - SCANNER_REDIS_URL="%YOUR_REDIS_SCHEME%://:%YOUR_REDIS_PASSWORD%@%YOUR_REDIS_HOSTS%/5?idle_timeout_seconds=30"
+      - SCANNER_STORE_REDIS_URL="%YOUR_REDIS_SCHEME%://%YOUR_REDIS_PASSWORD%@%YOUR_REDIS_HOSTS%/5?idle_timeout_seconds=30"
+      - SCANNER_JOB_QUEUE_REDIS_URL="%YOUR_REDIS_SCHEME%://%YOUR_REDIS_PASSWORD%@%YOUR_REDIS_HOSTS%/5?idle_timeout_seconds=30"
 
 patchesJson6902:
   - target:
