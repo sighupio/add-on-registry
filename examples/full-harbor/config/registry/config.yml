@@ -5,7 +5,7 @@
 ---
 version: 0.1
 log:
-  level: debug
+  level: info
   fields:
     service: registry
 storage:
@@ -26,10 +26,13 @@ storage:
 redis:
   addr: "redis:6379"
   db: 2
-  password:
   readtimeout: 10s
   writetimeout: 10s
   dialtimeout: 10s
+  pool:
+    maxidle: 100
+    maxactive: 500
+    idletimeout: 60s
 http:
   addr: :5000
   relativeurls: false
@@ -46,24 +49,6 @@ auth:
     path: /etc/registry/passwd
 validation:
   disabled: true
-notifications:
-  endpoints:
-    - name: harbor
-      disabled: false
-      url: http://core/service/notifications
-      timeout: 3000ms
-      threshold: 5
-      backoff: 1s
-      ignoredmediatypes:
-        - application/vnd.docker.image.rootfs.diff.tar.gzip
-        - application/vnd.docker.image.rootfs.foreign.diff.tar.gzip
-        - application/vnd.oci.image.layer.v1.tar
-        - application/vnd.oci.image.layer.v1.tar+gzip
-        - application/vnd.oci.image.layer.v1.tar+zstd
-        - application/vnd.oci.image.layer.nondistributable.v1.tar
-        - application/vnd.oci.image.layer.nondistributable.v1.tar+gzip
-        - application/vnd.oci.image.layer.nondistributable.v1.tar+zstd
-        - application/octet-stream
 compatibility:
   schema1:
     enabled: true
