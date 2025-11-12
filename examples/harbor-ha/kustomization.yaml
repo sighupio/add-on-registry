@@ -23,26 +23,28 @@ configMapGenerator:
       - POSTGRESQL_DATABASE=%YOUR_DB_NAME%
       - POSTGRESQL_SSLMODE=disable
       - EXT_ENDPOINT=%YOUR_INGRESS_HOST%
-      - LOG_LEVEL=info
       - _REDIS_URL_CORE="%YOUR_REDIS_SCHEME%://%YOUR_REDIS_PASSWORD%@%YOUR_REDIS_HOSTS%/0?idle_timeout_seconds=30"
       - _REDIS_URL_REG="%YOUR_REDIS_SCHEME%://%YOUR_REDIS_PASSWORD%@%YOUR_REDIS_HOSTS%/2?idle_timeout_seconds=30"
-      - HTTP_PROXY=
-      - HTTPS_PROXY=
 
   # Exporter overwritable configuration
   - name: exporter
     behavior: merge
     literals:
       - HARBOR_REDIS_URL=%YOUR_REDIS_SCHEME%://%YOUR_REDIS_PASSWORD%@%YOUR_REDIS_HOSTS%/redisMaster/1
+      - HARBOR_REDIS_NAMESPACE=jobservice_ns
+      - HARBOR_REDIS_TIMEOUT=3600
+      - HARBOR_DATABASE_DBNAME=%YOUR_DB_NAME%
+      - HARBOR_DATABASE_HOST=%YOUR_DB_HOSTNAME%
+      - HARBOR_DATABASE_MAX_IDLE_CONNS=100
+      - HARBOR_DATABASE_MAX_OPEN_CONNS=900
+      - HARBOR_DATABASE_PORT=5432
+      - HARBOR_DATABASE_SSLMODE=disable
+      - HARBOR_DATABASE_USERNAME=%YOUR_DB_USER%
     # JobService overwritable configuration
   - name: jobservice
     behavior: merge
     files:
       - config.yml=config/jobservice/config.yml
-    literals:
-      - LOG_LEVEL=debug
-      - HTTP_PROXY=
-      - HTTPS_PROXY=
     # Registry overwritable configuration
   - name: registry
     behavior: merge
@@ -55,20 +57,20 @@ secretGenerator:
   - name: core
     behavior: merge
     literals:
-      - secretKey=not-a-secure-key
-      - secret=P447FhxLeLwjDMYU
+      - secretKey=%CORE_SECURE_KEY%
+      - secret=%CORE_SECURE_SECRET%
       - HARBOR_ADMIN_PASSWORD=%HARBOR_ADMIN_PASSWORD%
       - POSTGRESQL_PASSWORD=%YOUR_DB_PASSWORD%
     # JobService overwritable configuration
   - name: jobservice
     behavior: merge
     literals:
-      - secret=Gx6IsNtY4NdWoK0u
+      - secret=%JOBSERVICE_SECURE_SECRET%
     # Registry overwritable configuration
   - name: registry
     behavior: merge
     literals:
-      - REGISTRY_HTTP_SECRET=Z6HTqCsLzHMmgr9W
+      - REGISTRY_HTTP_SECRET=%REGISTRY_SECURE_SECRET%
       - REGISTRY_REDIS_PASSWORD="%YOUR_REDIS_PASSWORD%"
   - name: trivy
     behavior: merge
@@ -76,6 +78,11 @@ secretGenerator:
       - SCANNER_REDIS_URL="%YOUR_REDIS_SCHEME%://:%YOUR_REDIS_PASSWORD%@%YOUR_REDIS_HOSTS%/5?idle_timeout_seconds=30"
       - SCANNER_STORE_REDIS_URL="%YOUR_REDIS_SCHEME%://%YOUR_REDIS_PASSWORD%@%YOUR_REDIS_HOSTS%/5?idle_timeout_seconds=30"
       - SCANNER_JOB_QUEUE_REDIS_URL="%YOUR_REDIS_SCHEME%://%YOUR_REDIS_PASSWORD%@%YOUR_REDIS_HOSTS%/5?idle_timeout_seconds=30"
+  - name: exporter
+    behavior: merge
+    literals:
+      - HARBOR_ADMIN_PASSWORD=%HARBOR_ADMIN_PASSWORD%
+      - POSTGRESQL_PASSWORD=%YOUR_DB_PASSWORD%
 
 patchesJson6902:
   - target:
