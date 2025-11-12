@@ -8,7 +8,7 @@ kind: Kustomization
 namespace: registry
 
 bases:
-  - ../../katalog/harbor/distributions/harbor-without-psql
+  - ../../katalog/harbor/distributions/harbor-ha
 
 configMapGenerator:
   # Core overwritable configuration
@@ -78,12 +78,6 @@ secretGenerator:
       - SCANNER_JOB_QUEUE_REDIS_URL="%YOUR_REDIS_SCHEME%://%YOUR_REDIS_PASSWORD%@%YOUR_REDIS_HOSTS%/5?idle_timeout_seconds=30"
 
 patchesJson6902:
-  - target:
-      group: apps
-      version: v1
-      kind: StatefulSet
-      name: redis
-    path: patch/redis.yml
   - target:
       group: ""
       version: v1
