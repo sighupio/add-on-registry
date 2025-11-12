@@ -1,16 +1,12 @@
-# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
-# Use of this source code is governed by a BSD-style
-# license that can be found in the LICENSE file.
-
----
+#Server listening port
 protocol: "http"
 port: 8080
 worker_pool:
   workers: 10
   backend: "redis"
   redis_pool:
-    redis_url: "%REDIS_SCHEME%://%YOUR_REDIS_PASSWORD%@%YOUR_REDIS_HOSTS%/1"
-    namespace: "jobservice_ns"
+    redis_url: "redis+sentinel://default:Replace_me@redis+sentinel:redis1:26379,redis2:26379,redis3:26379/redisMaster/1"
+    namespace: "harbor_job_service_namespace"
     idle_timeout_second: 3600
 job_loggers:
   - name: "DB"
@@ -21,6 +17,7 @@ metric:
   enabled: true
   path: /metrics
   port: 8001
+#Loggers for the job service
 loggers:
   - name: "STD_OUTPUT"
     level: INFO

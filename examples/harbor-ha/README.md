@@ -47,3 +47,18 @@ The parameters to be configured are:
 | `kustomization.yaml`, `config/jobservice/config.yml`, `config/registry/config.yml` | `%YOUR_REDIS_HOSTS%`      | The host list for Redis. See dedicated paragraph for more info            | `redis-sentinel-0:26379,redis-sentinel-1:26379,redis-sentinel-2:26379` |
 | `kustomization.yaml`                                                               | `%HARBOR_ADMIN_PASSWORD%` | The password for Harbor admin user                                        | `Harbor12345`                                                          |
 | `config/registry/config.yml`                                                       | `%YOUR_REDIS_MASTER_SET%` | The password for Redis. See dedicated paragraph for more info             | `redisMaster`                                                          |
+
+### Object Storage
+
+This setup assumes that you want to store your artifacts in an external object storage to enable HA for the registry component.
+
+The following table shows the needed parameters:
+
+| File                         | String to be replaced           | Description                                             | Example value                  |
+| ---------------------------- | ------------------------------- | ------------------------------------------------------- | ------------------------------ |
+| config/jobservice/config.yml | %YOUR_OBJECT_STORAGE_REGION%    | The region where your object storage resides            | us-east-1                      |
+| config/jobservice/config.yml | %YOUR_OBJECT_STORAGE_BUCKET%    | The bucket name where you want to store artifacts       | registry                       |
+| config/jobservice/config.yml | %YOUR_OBJECT_STORAGE_ENDPOINT%  | The endpoint where the object storage is reachable      | https://myendpoint.example.com |
+| config/jobservice/config.yml | %YOUR_OBJECT_STORAGE_HTTPS%     | Wether to use HTTPS or not to reach your object storage | true/false                     |
+| kustomization.yaml           | %YOUR_OBJECT_STORAGE_ACCESSKEY% | The ACCESS_KEY for your object storage                  | MYACCESSKEY                    |
+| kustomization.yaml           | %YOUR_OBJECT_STORAGE_SECRETKEY% | The SECRET_KEY for your object storage                  | MYSECRETKEY                    |

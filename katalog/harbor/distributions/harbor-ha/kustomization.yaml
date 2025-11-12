@@ -10,3 +10,27 @@ namespace: registry
 
 resources:
   - ../common
+
+patches:
+  - target:
+      kind: Deployment|StatefulSet
+    patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 2
+
+configMapGenerator:
+  - name: registry
+    behavior: merge
+    files:
+      - config.yml=config/registry/config.yml
+  - name: jobservice
+    behavior: merge
+    files:
+      - config.yml=config/jobservice/config.yml
+secretGenerator:
+  - name: registry
+    behavior: merge
+    literals:
+      - REGISTRY_STORAGE_S3_ACCESSKEY="accesskey"
+      - REGISTRY_STORAGE_S3_SECRETKEY="secretkey"

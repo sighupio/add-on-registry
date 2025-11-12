@@ -9,8 +9,12 @@ log:
   fields:
     service: registry
 storage:
-  filesystem:
-    rootdirectory: /storage
+  s3:
+    region: "%YOUR_OBJECT_STORAGE_REGION%"
+    bucket: "%YOUR_OBJECT_STORAGE_BUCKET%"
+    regionendpoint: "%YOUR_OBJECT_STORAGE_ENDPOINT%"
+    skipverify: %YOUR_OBJECT_STORAGE_SKIP_VERIFY%
+    secure: %YOUR_OBJECT_STORAGE_HTTPS%
   cache:
     layerinfo: redis
   maintenance:

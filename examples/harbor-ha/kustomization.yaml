@@ -72,6 +72,8 @@ secretGenerator:
     literals:
       - REGISTRY_HTTP_SECRET=%REGISTRY_SECURE_SECRET%
       - REGISTRY_REDIS_PASSWORD="%YOUR_REDIS_PASSWORD%"
+      - REGISTRY_STORAGE_S3_ACCESSKEY="%YOUR_OBJECT_STORAGE_ACCESSKEY%"
+      - REGISTRY_STORAGE_S3_SECRETKEY="%YOUR_OBJECT_STORAGE_SECRETKEY%"
   - name: trivy
     behavior: merge
     literals:
@@ -84,13 +86,13 @@ secretGenerator:
       - HARBOR_ADMIN_PASSWORD=%HARBOR_ADMIN_PASSWORD%
       - POSTGRESQL_PASSWORD=%YOUR_DB_PASSWORD%
 
-patchesJson6902:
+patches:
   - target:
-      group: ""
-      version: v1
-      kind: PersistentVolumeClaim
-      name: registry
-    path: patch/registry.yml
+      kind: Deployment|StatefulSet
+    patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 2
   - target:
       group: networking.k8s.io
       version: v1
