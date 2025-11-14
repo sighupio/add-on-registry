@@ -7,7 +7,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: registry
 
-bases:
+resources:
   - ../../katalog/harbor/distributions/harbor-ha
 
 configMapGenerator:
@@ -37,7 +37,7 @@ configMapGenerator:
       - HARBOR_DATABASE_HOST=%YOUR_DB_HOSTNAME%
       - HARBOR_DATABASE_MAX_IDLE_CONNS=100
       - HARBOR_DATABASE_MAX_OPEN_CONNS=900
-      - HARBOR_DATABASE_PORT=5432
+      - HARBOR_DATABASE_PORT=%YOUR_DB_PORT%
       - HARBOR_DATABASE_SSLMODE=disable
       - HARBOR_DATABASE_USERNAME=%YOUR_DB_USER%
     # JobService overwritable configuration
@@ -92,7 +92,7 @@ patches:
     patch: |
       - op: replace
         path: /spec/replicas
-        value: 2
+        value: %YOUR_WANTED_REPLICAS%
   - target:
       group: networking.k8s.io
       version: v1
