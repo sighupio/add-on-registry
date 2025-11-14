@@ -19,13 +19,13 @@ This setup assumes that you already have an existing Postgres instance and you w
 
 The parameters to be configured are:
 
-| File                                                                               | String to be replaced     | Description                                                               | Example value                                                          |
-| ---------------------------------------------------------------------------------- | ------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `kustomization.yaml`                                                               | `%YOUR_DB_HOSTNAME%`      | The hostname of the DB                                                    | `my-postgres.example.com`                                              |
-| `kustomization.yaml`                                                               | `%YOUR_DB_PORT%`          | The port on which the DB is listening                                     | `5432`                                                                 |
-| `kustomization.yaml`                                                               | `%YOUR_DB_USER%`          | The DB user to connect to the DB                                          | `harbor`                                                               |
-| `kustomization.yaml`                                                               | `%YOUR_DB_PASSWORD%`      | The password for the DB user to connect to the DB                         | `password`                                                             |
-| `kustomization.yaml`                                                               | `%YOUR_DB_NAME%`          | The DB name to be used with Harbor                                        | `registry`                                                             |
+| File                                  | String to be replaced     | Description                                                     | Example value                                  |
+| ------------------------------------- | ------------------------- | --------------------------------------------------------------- | ---------------------------------------------- |
+| `kustomization.yaml`                  | `%YOUR_DB_HOSTNAME%`      | The hostname of the DB                                          | `my-postgres.example.com`                      |
+| `kustomization.yaml`                  | `%YOUR_DB_PORT%`          | The port on which the DB is listening                           | `5432`                                         |
+| `kustomization.yaml`                  | `%YOUR_DB_USER%`          | The DB user to connect to the DB                                | `harbor`                                       |
+| `kustomization.yaml`                  | `%YOUR_DB_PASSWORD%`      | The password for the DB user to connect to the DB               | `password`                                     |
+| `kustomization.yaml`                  | `%YOUR_DB_NAME%`          | The DB name to be used with Harbor                              | `registry`                                     |
 
 ### Redis
 
@@ -62,3 +62,15 @@ The following table shows the needed parameters:
 | config/jobservice/config.yml | %YOUR_OBJECT_STORAGE_HTTPS%     | Wether to use HTTPS or not to reach your object storage | true/false                     |
 | kustomization.yaml           | %YOUR_OBJECT_STORAGE_ACCESSKEY% | The ACCESS_KEY for your object storage                  | MYACCESSKEY                    |
 | kustomization.yaml           | %YOUR_OBJECT_STORAGE_SECRETKEY% | The SECRET_KEY for your object storage                  | MYSECRETKEY                    |
+
+
+### Internal keys and secrets
+
+Remember to properly update the following secret strings and keys that are used by Harbor components for security purposes.
+
+| File                         | String to be replaced           | Description                                                    | Generator                                             |
+| ---------------------------- | ------------------------------- | -------------------------------------------------------------- | ----------------------------------------------------- |
+| kustomization.yaml           | %CORE_SECURE_KEY%               | 16 characters secret string used by the core component         | head -c16 /dev/urandom | base64 | head -c16 && echo   |
+| kustomization.yaml           | %CORE_SECURE_SECRET%            | 16 characters secret string used by the core component         | head -c16 /dev/urandom | base64 | head -c16 && echo   |
+| kustomization.yaml           | %JOBSERVICE_SECURE_SECRET%      | 16 characters secret string used by the jobservice component   | head -c16 /dev/urandom | base64 | head -c16 && echo   |
+| kustomization.yaml           | %REGISTRY_SECURE_SECRET%        | 16 characters secret string used by the registry component     | head -c16 /dev/urandom | base64 | head -c16 && echo   |
