@@ -18,7 +18,7 @@ spec:
       containers:
         - name: portal
           image: goharbor/harbor-portal:v2.11.2
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           resources:
             requests:
               memory: 256Mi
