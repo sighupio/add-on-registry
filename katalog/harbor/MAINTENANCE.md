@@ -14,14 +14,36 @@ helm repo update
 helm search repo harbor/harbor --versions
 ```
 
+### Verify the upstream values.yaml
+
+Check that the `values.yaml` file differs from the `MAINTENANCE.values.yaml` only for expected changes. If the upstream `values.yaml` contains new parameters, copy them into the `MAINTENANCE.values.yaml`.
+
+```bash
+VERSION=v1.18.0 # v2.14.0
+
+curl "https://raw.githubusercontent.com/goharbor/harbor-helm/refs/tags/${VERSION}/values.yaml" -o upstream.values.yaml
+```
+
+Known customizations are:
+
+- `caSecretName: "core-root-ca"`
+- `core.secretName: "core-root-ca"`
+- `expose.tls.certSource: secret`
+- `expose.tls.secret.secretName: "harbor-ingress-cert"`
+- `expose.ingress.annotations.cert-manager.io/cluster-issuer: "letsencrypt-staging"`
+- `imagePullPolicy: Always`
+- `metrics.enabled: true`
+- `metrics.serviceMonitor.enabled: true`
+- all `resources` for various components
+
 ### Download and template the Helm Chart
 
 ```bash
-VERSION=v1.15.2 #v2.11.2
+VERSION=v1.18.0 #v2.14.0
 rm -rf vendor
 helm template harbor harbor/harbor --version $VERSION -f MAINTENANCE.values.yaml --output-dir vendor
 for file in $(find ./vendor -type f \( -name "*.yaml" -o -name "*.yml" \)); do
-  yq -i 'del(.metadata.labels, .spec.selector, .spec.template.metadata)' $file
+  yq -i 'del(.metadata.labels, .spec.selector, .spec.template.metadata, .metadata.namespace)' $file
 done
 ```
 
