@@ -43,9 +43,9 @@ The table shows the latest 5 compatible versions. Check the [compatibility matri
 
 ### Prerequisites
 
-| Tool                        | Version    | Description                                                                                                                                                    |
-| --------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [furyctl][furyctl-repo]     | `>=0.6.0`  | The recommended tool to download and manage SD modules and their packages. To learn more about `furyctl` read the [official documentation][furyctl-repo].     |
+| Tool                        | Version   | Description                                                                                                                                                    |
+| --------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [furyctl][furyctl-repo]     | `>=0.6.0` | The recommended tool to download and manage SD modules and their packages. To learn more about `furyctl` read the [official documentation][furyctl-repo].      |
 | [kustomize][kustomize-repo] | `>=5.6.0` | Packages are customized using `kustomize`. To learn how to create your customization layer with `kustomize`, please refer to the [repository][kustomize-repo]. |
 
 All packages in this repository have the following dependencies, for package specific dependencies, please visit the single package's documentation:
@@ -105,14 +105,19 @@ The following set of alerts is included:
 
 ### Examples
 
-To see examples on how to customize Registry Add-On Module, please view the [examples](examples) directory.
+You can check out the examples we prepared about customiizing the Registry Add-On Module:
+
+| Example                               | Description                                                                                                |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| [full-harbor](./examples/full-harbor) | Full in-cluster Harbor Installation.                                                                       |
+| [harbor-ha](./examples/harbor-ha)     | Full Harbor installation, using external Database engine and Redis instances instead of the provided ones. |
+
+If you need to migrate your deployment type from `full-harbor` to `harbor-ha`, you can read the [Harbor Full to HA Migration Guide](./docs/operations/full-to-ha-migration.md).
 
 <!-- Links -->
 [harbor-site]: https://goharbor.io/
-[kfd-monitoring]: https://github.com/sighupio/fury-kubernetes-monitoring
 [furyctl-repo]: https://github.com/sighupio/furyctl
-[sighup-page]: https://sighup.io
-[kfd-repo]: https://github.com/sighupio/fury-distribution
+[kfd-repo]: https://github.com/sighupio/distribution
 [kustomize-repo]: https://github.com/kubernetes-sigs/kustomize
 [sd-docs]: https://docs.kubernetesfury.com/docs/distribution/
 [compatibility-matrix]: https://github.com/sighupio/add-on-registry/blob/master/docs/COMPATIBILITY_MATRIX.md
