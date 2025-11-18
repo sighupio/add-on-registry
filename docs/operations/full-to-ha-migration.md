@@ -114,17 +114,59 @@ curl -k -u "admin:<PASSWORD>" -X PUT \
   -d '{"read_only": true}'
 ```
 
-#### 2.3 Create Migration Secret
+#### 1.2 Create Folder Structure
 
-Create and customize the migration configuration secret:
+We will work with a folder structure like the following:
+
+```plaintext
+.
+└── add-on-registry
+    ├── examples
+    │   ├── full-to-ha-migration
+    │   └── harbor-ha
+    └── katalog
+        └── harbor
+            ├── core
+            ├── distributions
+            │   ├── common
+            │   └── harbor-ha
+            ├── exporter
+            ├── jobservice
+            ├── portal
+            ├── registry
+            └── trivy
+```
+
+To create it, run:
 
 ```bash
-# Download the secret template
-curl -O https://raw.githubusercontent.com/sighupio/addon-registry/main/full-to-ha-migration/00-env-secret.yaml
+ADD_ON_VERSION=feat/update-to-2-11 # check latest add-on version
+kustomize localize "https://github.com/sighupio/add-on-registry//examples/full-to-ha-migration?ref=${ADD_ON_VERSION}" add-on-registry
+cd add-on-registry
+# Download the migration manifests
+FILES=(
+  "00-env-secret.yaml"
+  "01-pvc-backup.yaml"
+  "02-job-dump.yaml"
+  "03-job-restore.yaml"
+  "04-skopeo-migration.yaml"
+)
+mkdir -p examples/full-to-ha-migration
 
+for file in "${FILES[@]}"; do
+  echo $file
+  curl "https://raw.githubusercontent.com/sighupio/add-on-registry/${ADD_ON_VERSION}/examples/full-to-ha-migration/${file}" -o "examples/full-to-ha-migration/${file}"
+done
+```
+
+#### 1.3 Customize Migration Secret
+
+Edit the `examples/full-to-ha-migration/00-env-secret.yaml` file to match your environment:
+
+```bash
 # Edit the secret with actual values
 # Replace ALL placeholders marked with %...%
-vi 00-env-secret.yaml
+vi examples/full-to-ha-migration/00-env-secret.yaml
 ```
 
 **Required customizations:**
@@ -150,7 +192,7 @@ vi 00-env-secret.yaml
 # This is optional but adviced
 kubectl create namespace harbor-migration
 
-kubectl apply -n harbor-migration -f 00-env-secret.yaml
+kubectl apply -n harbor-migration -f examples/full-to-ha-migration/00-env-secret.yaml
 ```
 
 ### Step 3: Database Migration
@@ -159,7 +201,7 @@ kubectl apply -n harbor-migration -f 00-env-secret.yaml
 
 ```bash
 # This provisions a 5Gi PVC to hold the DB dump - double check if it is sufficient
-kubectl apply -n harbor-migration -f https://raw.githubusercontent.com/sighupio/addon-registry/main/full-to-ha-migration/01-pvc-backup.yaml
+kubectl apply -n harbor-migration -f examples/full-to-ha-migration/01-pvc-backup.yaml
 
 # Verify PVC is bound
 kubectl get pvc -n harbor-migration harbor-db-backup-pvc
@@ -169,7 +211,7 @@ kubectl get pvc -n harbor-migration harbor-db-backup-pvc
 
 ```bash
 # Start the database dump job
-kubectl apply -n harbor-migration -f https://raw.githubusercontent.com/sighupio/addon-registry/main/full-to-ha-migration/02-job-dump.yaml
+kubectl apply -n harbor-migration -f examples/full-to-ha-migration/02-job-dump.yaml
 
 # Monitor dump progress
 kubectl logs -n harbor-migration -f job/harbor-db-dump
@@ -199,7 +241,7 @@ kubectl get job -n harbor-migration harbor-db-dump
 
 ```bash
 # Start the restore job
-kubectl apply -n harbor-migration -f https://raw.githubusercontent.com/sighupio/addon-registry/main/full-to-ha-migration/03-job-restore.yaml
+kubectl apply -n harbor-migration -f examples/full-to-ha-migration/03-job-restore.yaml
 
 # Monitor restore progress
 kubectl logs -n harbor-migration -f job/harbor-db-restore
@@ -237,34 +279,14 @@ kubectl run -it --rm psql-verify --image=postgres:17 --restart=Never -- \
 
 Deploy Harbor HA in a new namespace for validation before final cutover.
 
-#### 4.1 Prepare HA Configuration
+#### 4.1 Customize HA Configuration
 
-```bash
-# Create directory structure
-mkdir -p harbor-ha-stack/{config/{core,jobservice,registry},patch}
-cd harbor-ha-stack
-
-# Download HA example configuration
-curl -O https://raw.githubusercontent.com/sighupio/add-on-registry/feat/update-to-2-11/examples/harbor-ha/kustomization.yaml
-curl https://raw.githubusercontent.com/sighupio/add-on-registry/feat/update-to-2-11/examples/harbor-ha/config/core/app.conf -o config/core/app.conf
-curl https://raw.githubusercontent.com/sighupio/add-on-registry/feat/update-to-2-11/examples/harbor-ha/config/jobservice/config.yml -o config/jobservice/config.yml
-curl https://raw.githubusercontent.com/sighupio/add-on-registry/feat/update-to-2-11/examples/harbor-ha/config/registry/config.yml -o config/registry/config.yml
-curl https://raw.githubusercontent.com/sighupio/add-on-registry/feat/update-to-2-11/examples/harbor-ha/config/registry/ctl-config.yml -o config/registry/ctl-config.yml
-curl https://raw.githubusercontent.com/sighupio/add-on-registry/feat/update-to-2-11/examples/harbor-ha/patch/ingress.yml -o patch/ingress.yml
-
-# Replace the resources
-kustomize edit add resource "https://github.com/sighupio/add-on-registry//katalog/harbor/distributions/harbor-ha?ref=feat/update-to-2-11" 
-kustomize edit remove resource "../../katalog/harbor/distributions/harbor-ha"
-```
-
-#### 4.2 Customize HA Configuration
-
-Follow [`harbor-ha`'s README](../../examples/harbor-ha/README.md) to know how to customize this add-on to fit your environment.
+Follow [`harbor-ha`'s README](../../examples/harbor-ha/README.md) to know how to customize this add-on to fit your environment. You will need to edit files inside `examples/harbor-ha`.
 
 > [!WARNING]
 > the `CORE_SECURE_SECRET` and `CORE_SECURE_KEY` parameters **MUST** be exactly the same as the "full" Harbor stack.
 
-Additionally, update `patch/ingress.yml`:
+Additionally, update `examples/harbor-ha/patch/ingress.yml`:
 
 ```yaml
 - op: replace
@@ -272,19 +294,21 @@ Additionally, update `patch/ingress.yml`:
   value: harbor-new.example.com  # Temporary hostname
 ```
 
-and update the `EXT_ENDPOINT` variable in the `kustomization.yaml` file accordingly.
+and update the `EXT_ENDPOINT` variable in the `examples/harbor-ha/kustomization.yaml` file accordingly.
 
 Also, set a temporary namespace as target:
 
 ```bash
+pushd examples/harbor-ha/
 kustomize edit set namespace registry-new
+popd
 ```
 
-#### 4.3 Deploy Harbor HA
+#### 4.2 Deploy Harbor HA
 
 ```bash
 # Apply the HA configuration
-kustomize build . | kubectl apply -f - --server-side
+kustomize build examples/harbor-ha | kubectl apply -f - --server-side
 
 # Monitor deployment
 kubectl get pods -n registry-new -w
@@ -293,7 +317,7 @@ kubectl get pods -n registry-new -w
 kubectl wait --for=condition=ready pod -l app=harbor -n registry-new --timeout=600s
 ```
 
-#### 4.4 Validate HA Deployment
+#### 4.3 Validate HA Deployment
 
 ```bash
 # Check all components are running
@@ -309,7 +333,7 @@ curl -k https://harbor-new.example.com/api/v2.0/systeminfo
 > [!INFO]
 > At this stage, you should see all projects and repositories in the Harbor UI, but image pulls will fail because the actual image layers have not been migrated to S3 yet.
 
-#### 4.5 Disable Read-only in the new registry
+#### 4.4 Disable Read-only in the new registry
 
 To enable the copy of images from the "full" Harbor to the "HA" Harbor, you need to disable Read-only mode in the "HA" Harbor.
 
@@ -336,7 +360,7 @@ Use Skopeo to copy all container images from the old registry to the new one.
 
 ```bash
 # Apply skopeo migration job
-kubectl apply -f https://raw.githubusercontent.com/sighupio/addon-registry/main/full-to-ha-migration/04-skopeo-migration.yaml
+kubectl apply -f -n harbor-migration examples/full-to-ha-migration/04-skopeo-migration.yaml
 
 # Monitor migration progress
 kubectl logs -f job/skopeo-migration
@@ -427,18 +451,19 @@ After validating the temporary HA Harbor, perform the final cutover.
 
 ```bash
 # Update HA configuration for production ingress
-cd harbor-ha-stack
-vi patch/ingress.yml
+vi examples/harbor-ha/patch/ingress.yml
 # Change hostname to: harbor.example.com (original hostname)
-vi kustomization.yaml
+vi examples/harbor-ha/kustomization.yaml
 # update the EXT_ENDPOINT variable to: harbor.example.com (original hostname)
 
 # Update kustomization namespace
+pushd examples/harbor-ha
 kustomize edit set namespace registry # or your production namespace
+popd
 
 # Apply HA Harbor in production namespace
 # This will replace Deployments, Services, Ingress from full Harbor
-kustomize build . | kubectl apply -f - --server-side
+kustomize build examples/harbor-ha | kubectl apply -f - --server-side
 
 # Monitor rollout
 kubectl rollout status deployment/core -n registry
@@ -480,7 +505,7 @@ If critical issues are encountered during or after cutover:
 If issues occur immediately after cutover:
 
 ```bash
-# Restore full Harbor from the old Kustomize project
+# Restore full Harbor from your old Kustomize project
 kustomize build /path/to/full/harbor | kubectl apply -f - --server-side
 
 # Wait for pods to be ready
@@ -500,10 +525,10 @@ If the old StatefulSets have been deleted:
 # Recreate full Harbor
 kustomize build /path/to/full/harbor | kubectl apply -f - --server-side
 kubectl scale deployment -n registry core exporter jobservice portal registry --replicas 0 # scale down Harbor services
-vi 00-env-secret.yaml # edit the credentials and endpoints of "DST" variables to point to the old database
-kubectl apply -f 00-env-secret.yaml --server-side
+vi examples/full-to-ha-migration/00-env-secret.yaml # edit the credentials and endpoints of "DST" variables to point to the old database
+kubectl apply -f examples/full-to-ha-migration/00-env-secret.yaml --server-side
 # Restore database from migration backup
-kubectl apply -f 02-job-restore.yaml
+kubectl apply -f examples/full-to-ha-migration/02-job-restore.yaml
 kubectl scale deployment -n registry core exporter jobservice portal registry --replicas 1 # scale back up Harbor services
 ```
 
