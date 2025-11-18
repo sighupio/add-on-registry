@@ -46,6 +46,7 @@ secretGenerator:
       - SCANNER_STORE_REDIS_URL="redis://redis:6379/5?idle_timeout_seconds=30"
       - SCANNER_JOB_QUEUE_REDIS_URL="redis://redis:6379/5?idle_timeout_seconds=30"
     name: trivy
+    
 labels:
   - includeSelectors: true
     pairs:
