@@ -23,7 +23,7 @@ Registry Add-On Module provides the following packages:
 
 | Package                  | Version  | Description                                                                                                                                                          |
 | ------------------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Harbor](katalog/harbor) | `v2.9.5` | Harbor is an open-source container image registry that secures images with role-based access control, scans images for vulnerabilities, and signs images as trusted. |
+| [Harbor](katalog/harbor) | `v2.11.2` | Harbor is an open-source container image registry that secures images with role-based access control, scans images for vulnerabilities, and signs images as trusted. |
 
 Click on each package to see its full documentation.
 
@@ -31,11 +31,11 @@ Click on each package to see its full documentation.
 
 | Kubernetes Version |   Compatibility    | Notes                                               |
 | ------------------ | :----------------: | --------------------------------------------------- |
-| `1.28.x`           | :white_check_mark: | Conformance tests passed.                           |
 | `1.29.x`           | :white_check_mark: | Conformance tests passed.                           |
 | `1.30.x`           | :white_check_mark: | Conformance tests passed.                           |
 | `1.31.x`           | :white_check_mark: | Conformance tests passed.                           |
 | `1.32.x`           | :white_check_mark: | Conformance tests passed.                           |
+| `1.33.x`           | :white_check_mark: | Conformance tests passed.                           |
 
 The table shows the latest 5 compatible versions. Check the [compatibility matrix][compatibility-matrix] for the complete list of all supported versions.
 
