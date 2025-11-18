@@ -3,6 +3,9 @@
 # license that can be found in the LICENSE file.
 
 ---
+- op: add
+  path: "/spec/ingressClassName"
+  value: "nginx"
 
 - op: add
   path: "/metadata/annotations/forecastle.stakater.com~1expose"

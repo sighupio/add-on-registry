@@ -4,6 +4,10 @@
 
 ---
 - op: add
+  path: "/spec/ingressClassName"
+  value: "nginx"
+
+- op: add
   path: "/metadata/annotations/forecastle.stakater.com~1expose"
   value: "true"
 

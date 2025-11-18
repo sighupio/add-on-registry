@@ -10,13 +10,12 @@ metadata:
   labels:
     app: harbor
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: letsencrypt-staging
     ingress.kubernetes.io/proxy-body-size: "0"
     ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
-  ingressClassName: nginx
   tls:
     - secretName: harbor-ingress-cert
       hosts:
