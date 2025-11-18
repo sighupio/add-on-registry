@@ -18,7 +18,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: exporter
-          image: goharbor/harbor-exporter:v2.11.2
+          image: goharbor/harbor-exporter:v2.14.0
           imagePullPolicy: Always
           livenessProbe:
             httpGet:

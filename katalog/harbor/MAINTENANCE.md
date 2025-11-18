@@ -43,11 +43,13 @@ Known customizations are:
 
 ```bash
 VERSION=v1.18.0 #v2.14.0
+HARBOR_VERSION=v2.14.0
 rm -rf vendor
 helm template harbor harbor/harbor --version $VERSION -f MAINTENANCE.values.yaml --output-dir vendor
 for file in $(find ./vendor -type f \( -name "*.yaml" -o -name "*.yml" \)); do
   yq -i 'del(.metadata.labels, .spec.selector, .spec.template.metadata, .metadata.namespace)' $file
 done
+curl "https://raw.githubusercontent.com/goharbor/harbor/refs/tags/${HARBOR_VERSION}/contrib/grafana-dashboard/metrics-example.json" | jq > exporter/dashboards/harbor-general.json 
 ```
 
 ### Check the diff and update the images

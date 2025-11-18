@@ -47,6 +47,7 @@ configMapGenerator:
       - PORTAL_URL=http://portal
       - REGISTRY_CONTROLLER_URL=http://registry:8080
       - REGISTRY_CREDENTIAL_USERNAME=harbor_registry_user
+      - REPLICATION_ADAPTER_WHITELIST=ali-acr,aws-ecr,azure-acr,docker-hub,docker-registry,github-ghcr,google-gcr,harbor,huawei-SWR,jfrog-artifactory,tencent-tcr,volcengine-cr
       - METRIC_ENABLE=true
       - METRIC_NAMESPACE=harbor
       - METRIC_PATH=/metrics
@@ -55,7 +56,7 @@ configMapGenerator:
       - HTTP_PROXY=
       - HTTPS_PROXY=
       - NO_PROXY=core,jobservice,database,registry,portal,trivy,exporter,127.0.0.1,localhost,.local,.internal
-      - PERMITTED_REGISTRY_TYPES_FOR_PROXY_CACHE=docker-hub,harbor,azure-acr,aws-ecr,google-gcr,quay,docker-registry,github-ghcr,jfrog-artifactory
+      - PERMITTED_REGISTRY_TYPES_FOR_PROXY_CACHE=docker-hub,harbor,azure-acr,ali-acr,aws-ecr,google-gcr,docker-registry,github-ghcr,jfrog-artifactory
       - QUOTA_UPDATE_PROVIDER=db
 secretGenerator:
   - name: core

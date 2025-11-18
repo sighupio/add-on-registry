@@ -21,17 +21,18 @@ configMapGenerator:
     files:
       - config.yml=config/config.yml
     literals:
-      - CORE_URL=http://core
-      - REGISTRY_URL=http://registry:5000
-      - TOKEN_SERVICE_URL=http://core/service/token
-      - REGISTRY_CONTROLLER_URL=http://registry:8080
-      - METRIC_NAMESPACE=harbor
-      - METRIC_SUBSYSTEM=jobservice
-      - JOBSERVICE_WEBHOOK_JOB_MAX_RETRY=3
-      - JOBSERVICE_WEBHOOK_JOB_HTTP_CLIENT_TIMEOUT=3
-      - HTTP_PROXY=
-      - HTTPS_PROXY=
-      - NO_PROXY=core,jobservice,database,registry,portal,trivy,exporter,127.0.0.1,localhost,.local,.internal
+    - CORE_URL=http://core
+    - REGISTRY_URL=http://registry:5000
+    - TOKEN_SERVICE_URL=http://core/service/token
+    - REGISTRY_CONTROLLER_URL=http://registry:8080
+    - METRIC_NAMESPACE=harbor
+    - METRIC_SUBSYSTEM=jobservice
+    - JOBSERVICE_WEBHOOK_JOB_MAX_RETRY=3
+    - JOBSERVICE_WEBHOOK_JOB_HTTP_CLIENT_TIMEOUT=3
+    - HTTP_PROXY=""
+    - HTTPS_PROXY=""
+    - LOG_LEVEL=info
+    - NO_PROXY=core,jobservice,database,registry,portal,trivy,exporter,127.0.0.1,localhost,.local,.internal
 
 secretGenerator:
   - name: jobservice
