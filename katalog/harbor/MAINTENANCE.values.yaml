@@ -885,10 +885,10 @@ trivy:
   # You might want to set the value of this flag to `true` in test or CI/CD environments to avoid GitHub rate limiting issues.
   # If the value is set to `true` you have to manually download the `trivy.db` file and mount it in the
   # `/home/scanner/.cache/trivy/db/trivy.db` path.
-  skipUpdate: false
+  skipUpdate: true
   # skipJavaDBUpdate If the flag is enabled you have to manually download the `trivy-java.db` file and mount it in the
   # `/home/scanner/.cache/trivy/java-db/trivy-java.db` path
-  skipJavaDBUpdate: false
+  skipJavaDBUpdate: true
   # The dbRepository and javaDBRepository flags can take multiple values, improving reliability when downloading databases.
   # Databases are downloaded in priority order until one is successful.
   # An attempt to download from the next repository is only made if a temporary error is received (e.g. status 429 or 5xx).
@@ -908,7 +908,7 @@ trivy:
   # exist in the local repositories. It means a number of detected vulnerabilities might be fewer in offline mode.
   # It would work if all the dependencies are in local.
   # This option doesn’t affect DB download. You need to specify skipUpdate as well as offlineScan in an air-gapped environment.
-  offlineScan: false
+  offlineScan: true
   # Comma-separated list of what security issues to detect. Defaults to `vuln`.
   securityCheck: "vuln"
   # The duration to wait for scan completion

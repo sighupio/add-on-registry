@@ -34,6 +34,9 @@ Known customizations are:
 - `imagePullPolicy: Always`
 - `metrics.enabled: true`
 - `metrics.serviceMonitor.enabled: true`
+- `trivy.skipUpdate: true`
+- `trivy.skipJavaDBUpdate: true`
+- `trivy.offlineScan: true`
 - all `resources` for various components
 
 ### Download and template the Helm Chart
