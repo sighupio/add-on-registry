@@ -76,3 +76,16 @@ The following table show the needed parameters to be customized for Harbor itsel
 | `kustomization.yaml`                      | `%CORE_SECURE_SECRET%`       | 16 characters secret string used by the core component       | Output of `head -c16 /dev/urandom \| base64 \| head -c16 && echo` |
 | `kustomization.yaml`                      | `%JOBSERVICE_SECURE_SECRET%` | 16 characters secret string used by the jobservice component | Output of `head -c16 /dev/urandom \| base64 \| head -c16 && echo` |
 | `kustomization.yaml`                      | `%REGISTRY_SECURE_SECRET%`   | 16 characters secret string used by the registry component   | Output of `head -c16 /dev/urandom \| base64 \| head -c16 && echo` |
+
+
+## Configuration
+
+# Image pull
+
+When using an S3-compatible object storage, Harbor supports on of two different ways to allow end-users to pull images: 
+- if redirect is enabled, the end-users will be redirected to pull image layers directly from the S3 bucket 
+- if redirect is disabled, the registry component will act as a middleware and will effectively download the layers from S3 itself, and the end-users will be downloading them from Harbor.
+
+[CNCF documentation](https://distribution.github.io/distribution/about/configuration/#redirect)
+
+The parameter that governs this behaviour is "storage.redirect.disable" in the config/registry/config.yml file. 
