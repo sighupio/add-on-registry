@@ -10,6 +10,7 @@ Search the Chart version that you'll need with
 
 ```bash
 helm repo add harbor https://helm.goharbor.io
+helm repo update
 helm search repo harbor/harbor --versions
 ```
 

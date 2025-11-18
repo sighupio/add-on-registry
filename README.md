@@ -52,34 +52,46 @@ All packages in this repository have the following dependencies, for package spe
 
 ### Deployment
 
-1. List the packages you want to deploy and their version in a `Furyfile.yml`
+1. Download the Kustomize distribution that you want to install:
 
-```yaml
-bases:
-  - name: registry/harbor
-    version: "v3.2.0"
-```
+    ```bash
+    ADD_ON_REGISTRY_DISTRIBUTION="full-harbor" # or "harbor-ha"
+    ADD_ON_REGISTRY_VERSION=v3.4.0 # check the latest version
+    kustomize localize "https://github.com/sighupio/add-on-registry//katalog/harbor/distributions/${ADD_ON_REGISTRY_DISTRIBUTION}?ref=${ADD_ON_REGISTRY_VERSION}" vendor
+    ```
 
-> See `furyctl` [documentation][furyctl-repo] for additional details about `Furyfile.yml` format.
+2. Inspect the download packages under `./vendor/katalog/registry/harbor`.
 
-2. Execute `furyctl vendor -H` to download the packages
+3. Define a `kustomization.yaml` that includes the `./vendor/katalog/registry/harbor/distributions/<your desired distribution>` directory as resource.
 
-3. Inspect the download packages under `./vendor/katalog/registry/harbor`.
+    ```yaml
+    resources:
+    - ./vendor/katalog/registry/harbor/distributions/<your desired distribution>
+    ```
 
-4. Define a `kustomization.yaml` that includes the `./vendor/katalog/registry/harbor` directory as resource.
+4. Apply the necessary patches. You can see some examples in the [examples directory](examples/).
 
-```yaml
-resources:
-- ./vendor/katalog/registry/harbor
-```
-
-5. Apply the necessary patches. You can see some examples in the [examples directory](examples/).
-
-6. To deploy the packages to your cluster, execute:
+5. To deploy the packages to your cluster, execute:
 
 ```bash
 kustomize build . | kubectl apply -f -
 ```
+
+### Upgrading
+
+Always check the [Upgrade Guide](https://goharbor.io/docs/latest/administration/upgrade/) from Harbor. Make sure that the version you are currently running is compatible with the upgrade to the version you want to install.
+
+The `Core` component of Harbor automatically runs the needed Database migrations, so normally it is sufficient to just deploy the new module version.
+
+You can make sure that the migration runs on a single Pod by:
+
+1. Scaling down to zero the existing `core` deployment: `kubectl scale deploy -n registry core --replicas 0`
+2. Apply the new version, making sure that the `replicas` of the `core` deployment is set to `1`
+3. When the migration is finished, you can set the desired number of replicas and apply again
+
+> [!WARNING]
+>
+> *Always* backup your data before attempting an upgrade!
 
 ### Monitoring
 
