@@ -23,7 +23,7 @@ Registry Add-On Module provides the following packages:
 
 | Package                  | Version  | Description                                                                                                                                                          |
 | ------------------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Harbor](katalog/harbor) | `v2.11.2` | Harbor is an open-source container image registry that secures images with role-based access control, scans images for vulnerabilities, and signs images as trusted. |
+| [Harbor](katalog/harbor) | `v2.14.0` | Harbor is an open-source container image registry that secures images with role-based access control, scans images for vulnerabilities, and signs images as trusted. |
 
 Click on each package to see its full documentation.
 
@@ -35,6 +35,7 @@ Click on each package to see its full documentation.
 | `1.30.x`           | :white_check_mark: | Conformance tests passed.                           |
 | `1.31.x`           | :white_check_mark: | Conformance tests passed.                           |
 | `1.32.x`           | :white_check_mark: | Conformance tests passed.                           |
+| `1.33.x`           | :white_check_mark: | Conformance tests passed.                           |
 | `1.33.x`           | :white_check_mark: | Conformance tests passed.                           |
 
 The table shows the latest 5 compatible versions. Check the [compatibility matrix][compatibility-matrix] for the complete list of all supported versions.
@@ -55,7 +56,7 @@ All packages in this repository have the following dependencies, for package spe
 
     ```bash
     ADD_ON_REGISTRY_DISTRIBUTION="full-harbor" # or "harbor-ha"
-    ADD_ON_REGISTRY_VERSION=v3.4.0 # check the latest version
+    ADD_ON_REGISTRY_VERSION=v3.5.0 # check the latest version
     kustomize localize "https://github.com/sighupio/add-on-registry//katalog/harbor/distributions/${ADD_ON_REGISTRY_DISTRIBUTION}?ref=${ADD_ON_REGISTRY_VERSION}" vendor
     ```
 
