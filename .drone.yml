@@ -57,7 +57,6 @@ type: docker
 
 depends_on:
   - policeman
-  - e2e-kubernetes-1.28
 
 clone:
   depth: 1
@@ -577,6 +576,7 @@ type: docker
 
 depends_on:
   - policeman
+  - e2e-kubernetes-1.32
 
 clone:
   depth: 1
