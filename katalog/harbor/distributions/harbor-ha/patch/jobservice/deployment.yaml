@@ -6,10 +6,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "registry"
+  name: "jobservice"
 spec:
   template:
     spec:
       volumes:
-        - name: data
+        - name: job-logs
           emptyDir: {}
+          persistentVolumeClaim:
+            $patch: delete

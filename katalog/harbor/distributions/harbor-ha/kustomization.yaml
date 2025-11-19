@@ -18,8 +18,10 @@ patches:
       - op: replace
         path: /spec/replicas
         value: 2
-  - path: ./patch/delete-registry-pvc.yaml
-  - path: ./patch/registry.yaml
+  - path: ./patch/jobservice/delete-pvc.yaml
+  - path: ./patch/jobservice/deployment.yaml
+  - path: ./patch/registry/delete-pvc.yaml
+  - path: ./patch/registry/deployment.yaml
 configMapGenerator:
   - name: registry
     behavior: merge
