@@ -1,0 +1,11 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "registry"
+spec:
+  template:
+    spec:
+      volumes:
+        - name: data
+          emptyDir: {}
