@@ -113,8 +113,14 @@ Compared to the official dashboards, the following changes have been made:
 #### Prometheus Rules
 
 Harbor upstream does not provide a set of Prometheus Rules that we could include.
-The Prometheus Rules defined in `katalog/harbor/exporter/rules.yml` are inspired by those provided by:
-<https://promcat.io/apps/harbor>
+The Prometheus Rules defined in `katalog/harbor/exporter/rules.yml` are copied from:
+<https://github.com/sysdiglabs/promcat-resources/blob/master/resources/harbor/alerts-v2.2.yaml>
+
+> [!WARNING]
+>
+> The promcat-resources repo has been unmantained for 2+ years.
+> Even though the Rules are working correctly, we might want to open a PR to the upstream project that we use for other systems' rules,  
+> <https://github.com/samber/awesome-prometheus-alerts>, which is more actively maintained.
 
 Once deployed, you will be able to find some `Alert`s defined on the Prometheus dashboard.
 

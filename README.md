@@ -111,9 +111,17 @@ You can monitor the status of Harbor from the provided Grafana Dashboards. Here 
 
 The following set of alerts is included:
 
-| Alert Name                         | Summary                                                                                                                                             | Description                                                                                     |
-| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| HarborIsDown                       | The service of Harbor is Down                                                                                                                       | [Critical]: Check the deployment of Harbor and all components as they may be down               |
+| Alert Name                            | Summary                                      | Description                                                                       |
+| ------------------------------------- | -------------------------------------------- | --------------------------------------------------------------------------------- |
+| HarborCoreIsDown                      | Harbor Core Is Down                          | [High]: Check the `core` Deployment as it may be down                             |
+| HarborDatabaseIsDown                  | Harbor Database Is Down                      | [High]: Check the connection with the Database                                    |
+| HarborRegistryIsDown                  | Harbor Registry Is Down                      | [High]: Check the `registry` Deployment as it may be down                         |
+| HarborRedisIsDown                     | Harbor Redis Is Down                         | [High]: Check the connection with Redis                                           |
+| HarborTrivyIsDown                     | Harbor Trivy Is Down                         | [High]: Check the `trivy` StatefulSet as it may be down                           |
+| HarborJobServiceIsDown                | Harbor JobService Is Down                    | [High]: Check the `jobService` Deployment as it may be down                       |
+| ProjectQuotaIsRaisingTheLimit         | Project Quota Is Raising The Limit           | [High]: Projects are exhausting the global quota                                  |
+| Harborp99latencyishigherthan10seconds | Harbor p99 latency is higher than 10 seconds | [Medium]: Registry's response latencies are higher than usual                     |
+| HarborErrorRateisHigh                 | Harbor Error Rate is High                    | [Medium]: Registry's error rate in responses is higher than usual                 |
 
 ### Examples
 
