@@ -550,7 +550,6 @@ Verify that:
 
 When you are confident that the environment is stable enough, you can delete the old resources and migration backup:
 
-<!-- TODO: controllare che il PVC registry non sia effettivamente montato dal nuovo microservizio! -->
 ```bash
 # Delete Database and Redis StatefulSets from old "full" Harbor
 kubectl delete statefulset -n registry database redis
