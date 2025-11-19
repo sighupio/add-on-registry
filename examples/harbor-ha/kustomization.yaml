@@ -89,6 +89,7 @@ secretGenerator:
 patches:
   - target:
       kind: Deployment|StatefulSet
+      name: trivy|core|jobservice|portal|registry
     patch: |
       - op: replace
         path: /spec/replicas
