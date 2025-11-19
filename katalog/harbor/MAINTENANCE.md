@@ -49,7 +49,11 @@ helm template harbor harbor/harbor --version $VERSION -f MAINTENANCE.values.yaml
 for file in $(find ./vendor -type f \( -name "*.yaml" -o -name "*.yml" \)); do
   yq -i 'del(.metadata.labels, .spec.selector, .spec.template.metadata, .metadata.namespace)' $file
 done
-curl "https://raw.githubusercontent.com/goharbor/harbor/refs/tags/${HARBOR_VERSION}/contrib/grafana-dashboard/metrics-example.json" | jq > exporter/dashboards/harbor-general.json 
+curl "https://raw.githubusercontent.com/goharbor/harbor/refs/tags/${HARBOR_VERSION}/contrib/grafana-dashboard/metrics-example.json" \
+  | yq '
+    (.panels | .. | select(has "targets") | .. | select(has("expr")).expr) |=
+      sub("service=~\"harbor-\\.\\*\"", "job=\"harbor\""
+    )' -ojson > exporter/dashboards/harbor-general.json
 ```
 
 ### Check the diff and update the images
