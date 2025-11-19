@@ -36,7 +36,6 @@ Click on each package to see its full documentation.
 | `1.31.x`           | :white_check_mark: | Conformance tests passed.                           |
 | `1.32.x`           | :white_check_mark: | Conformance tests passed.                           |
 | `1.33.x`           | :white_check_mark: | Conformance tests passed.                           |
-| `1.33.x`           | :white_check_mark: | Conformance tests passed.                           |
 
 The table shows the latest 5 compatible versions. Check the [compatibility matrix][compatibility-matrix] for the complete list of all supported versions.
 
