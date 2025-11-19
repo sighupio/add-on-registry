@@ -15,7 +15,6 @@ resources:
 images:
   - name: goharbor/trivy-adapter-photon
     newName: registry.sighup.io/fury/goharbor/trivy-adapter-photon-offline
-    newTag: v2.11.2
   - name: registry.sighup.io/fury/kubectl
     newTag: "1.33.4"
 
@@ -46,7 +45,7 @@ secretGenerator:
       - SCANNER_STORE_REDIS_URL="redis://redis:6379/5?idle_timeout_seconds=30"
       - SCANNER_JOB_QUEUE_REDIS_URL="redis://redis:6379/5?idle_timeout_seconds=30"
     name: trivy
-    
+
 labels:
   - includeSelectors: true
     pairs:

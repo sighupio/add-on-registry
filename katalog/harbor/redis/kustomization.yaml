@@ -10,7 +10,6 @@ namespace: registry
 images:
   - name: goharbor/redis-photon
     newName: registry.sighup.io/fury/goharbor/redis-photon
-    newTag: v2.11.2
 
 resources:
   - sts.yml
