@@ -573,6 +573,12 @@ kubectl delete pvc -n harbor-migration harbor-db-backup-pvc
 > [!WARNING]
 > Retain the migration PVC (`harbor-db-backup-pvc`) and the old registry PVC (`registry`) for at least 7 days after migration for disaster recovery purposes. You can use those to fully recover to the same state as before the migration.
 
+If all went well, you can also delete the `examples/full-to-ha-migration` folder:
+
+```bash
+rm -rf examples/full-to-ha-migration
+```
+
 ## Additional Resources
 
 - [Harbor Official Documentation](https://goharbor.io/docs/)
