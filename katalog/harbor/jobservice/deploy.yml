@@ -74,8 +74,6 @@ spec:
               subPath: config.yml
             - name: job-logs
               mountPath: /var/log/jobs
-            - name: job-scandata-exports
-              mountPath: /var/scandata_exports
       volumes:
         - name: config
           configMap:
@@ -83,6 +81,3 @@ spec:
         - name: job-logs
           persistentVolumeClaim:
             claimName: pvc-jobservice
-        - name: job-scandata-exports
-          persistentVolumeClaim:
-            claimName: pvc-job-scandata-exports
