@@ -130,7 +130,7 @@ If you need to migrate your deployment type from `full-harbor` to `harbor-ha`, y
 [furyctl-repo]: https://github.com/sighupio/furyctl
 [kfd-repo]: https://github.com/sighupio/distribution
 [kustomize-repo]: https://github.com/kubernetes-sigs/kustomize
-[sd-docs]: https://docs.kubernetesfury.com/docs/distribution/
+[sd-docs]: https://docs.sighup.io
 [compatibility-matrix]: https://github.com/sighupio/add-on-registry/blob/master/docs/COMPATIBILITY_MATRIX.md
 
 <!-- </SD-DOCS> -->
