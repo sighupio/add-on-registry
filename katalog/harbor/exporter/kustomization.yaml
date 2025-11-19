@@ -33,9 +33,9 @@ configMapGenerator:
       - HARBOR_EXPORTER_METRICS_ENABLED=true
       - HARBOR_EXPORTER_METRICS_PATH=/metrics
       - HARBOR_EXPORTER_PORT=8001
-      - HARBOR_METRIC_NAMESPACE=harbor
+      - HARBOR_METRIC_NAMESPACE=registry
       - HARBOR_METRIC_SUBSYSTEM=exporter
-      - HARBOR_REDIS_NAMESPACE=harbor_job_service_namespace
+      - HARBOR_REDIS_NAMESPACE=jobservice_ns
       - HARBOR_REDIS_TIMEOUT=3600
       - HARBOR_REDIS_URL=redis://redis:6379/1
       - HARBOR_SERVICE_HOST=core
