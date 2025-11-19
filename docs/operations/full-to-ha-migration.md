@@ -358,6 +358,12 @@ Use Skopeo to copy all container images from the old registry to the new one.
 
 #### 5.1 Start Image Migration
 
+You can use [Harbor's Replication feature](https://goharbor.io/docs/2.14.0/administration/configuring-replication/create-replication-endpoints/) to migrate all images from the old registry to the HA one.
+
+##### Alternative approach
+
+If, for some reason, it fails to migrate images uysing Replications, you could also use the `04-skopeo-migration.yaml` manifest to trigger a more manual approach:
+
 ```bash
 # Apply skopeo migration job
 kubectl apply -f -n harbor-migration examples/full-to-ha-migration/04-skopeo-migration.yaml
@@ -388,9 +394,7 @@ cat: /report/fail.log: No such file or directory
 >
 > The default configuration of the Job has a parallelism of 4 concurrent copies. You can edit that by downloading the Job manifest and setting the `CONCURRENCY` env variable to something else before applying it.
 
-#### 5.2 Monitor Migration
-
-The migration runs with 4 parallel workers by default. For large registries:
+The Job runs with 4 parallel workers by default. For large registries:
 
 ```bash
 # Check current progress (success/fail counts)
