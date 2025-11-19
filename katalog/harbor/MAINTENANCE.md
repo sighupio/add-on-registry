@@ -58,10 +58,6 @@ Once deployed, you will be able to find a `serviceMonitor` Prometheus Operator r
 
 The Ingress manifest `katalog/harbor/distributions/common/ingress.yml` will be found at `vendor/ingress/ingress.yaml`, as usual check for differences.
 
-### Jobservice
-
-We add an additional PVC for scan reports, so you will NOT find it in the vendor folder.
-
 ### Demos / Testing
 
 All the following examples are tested in the pipeline
