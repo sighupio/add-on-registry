@@ -121,7 +121,7 @@ You can check out the examples we prepared about customiizing the Registry Add-O
 | Example                               | Description                                                                                                |
 | ------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | [full-harbor](./examples/full-harbor) | Full in-cluster Harbor Installation.                                                                       |
-| [harbor-ha](./examples/harbor-ha)     | Full Harbor installation, using external Database engine and Redis instances instead of the provided ones. |
+| [harbor-ha](./examples/harbor-ha)     | Full Harbor installation in HA, using external Database engine and Redis instances instead of the provided ones. |
 
 If you need to migrate your deployment type from `full-harbor` to `harbor-ha`, you can read the [Harbor Full to HA Migration Guide](./docs/operations/full-to-ha-migration.md).
 
