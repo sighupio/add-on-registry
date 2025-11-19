@@ -58,7 +58,7 @@ Before starting the migration, ensure the following are in place:
 - Redis credentials available (if authentication enabled)
 
 > [!WARNING]
-> Redis Sentinel with password authentication has known compatibility issues with Harbor 2.14.x. You can configure password authentication for Redis itself, not for Sentinel. Verify compatibility with your Harbor version.
+> Redis Sentinel with password authentication has known compatibility issues with Harbor. You can configure password authentication for Redis itself, not for Sentinel. Verify compatibility with your Harbor version. We also [opened an issue upstream about this](https://github.com/goharbor/harbor/issues/22538).
 
 **S3-Compatible Object Storage:**
 
