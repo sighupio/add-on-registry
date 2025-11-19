@@ -38,7 +38,6 @@ spec:
                 name: exporter
             - secretRef:
                 name: exporter
-          env:
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
