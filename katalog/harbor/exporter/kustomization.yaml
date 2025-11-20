@@ -17,15 +17,14 @@ resources:
 images:
   - name: goharbor/harbor-exporter
     newName: registry.sighup.io/fury/goharbor/harbor-exporter
-    newTag: v2.9.5
 
 configMapGenerator:
   - name: exporter
     literals:
       - HARBOR_DATABASE_DBNAME=registry
       - HARBOR_DATABASE_HOST=database
-      - HARBOR_DATABASE_MAX_IDLE_CONNS=50
-      - HARBOR_DATABASE_MAX_OPEN_CONNS=100
+      - HARBOR_DATABASE_MAX_IDLE_CONNS=100
+      - HARBOR_DATABASE_MAX_OPEN_CONNS=900
       - HARBOR_DATABASE_PORT=5432
       - HARBOR_DATABASE_SSLMODE=disable
       - HARBOR_DATABASE_USERNAME=postgres
@@ -45,10 +44,16 @@ configMapGenerator:
       - HTTP_PROXY=""
       - HTTPS_PROXY=""
       - LOG_LEVEL=info
-      - NO_PROXY=core,jobservice,database,chartmuseum,trivy,notary-server,notary-signer,registry,portal,exporter,127.0.0.1,localhost,.local,.internal
+      - NO_PROXY=core,jobservice,database,registry,portal,trivy,exporter,127.0.0.1,localhost,.local,.internal
 
 secretGenerator:
   - name: exporter
     literals:
       - HARBOR_ADMIN_PASSWORD=Harbor12345
       - HARBOR_DATABASE_PASSWORD=changeit
+
+labels:
+  - includeSelectors: true
+    pairs:
+      app: harbor
+      component: exporter

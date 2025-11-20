@@ -9,9 +9,9 @@ load "./../lib/helper"
 @test "[SETUP] pre-requirements - CRDs" {
     info
     crds(){
-        kubectl apply -f https://raw.githubusercontent.com/sighupio/fury-kubernetes-monitoring/v1.12.0/katalog/prometheus-operator/crd-prometheus.yml
-        kubectl apply -f https://raw.githubusercontent.com/sighupio/fury-kubernetes-monitoring/v1.12.0/katalog/prometheus-operator/crd-servicemonitor.yml
-        kubectl apply -f https://raw.githubusercontent.com/sighupio/fury-kubernetes-monitoring/v1.12.0/katalog/prometheus-operator/crd-rule.yml
+        kubectl apply -f https://raw.githubusercontent.com/sighupio/module-monitoring/v4.0.1/katalog/prometheus-operator/crds/0prometheusCustomResourceDefinition.yaml
+        kubectl apply -f https://raw.githubusercontent.com/sighupio/module-monitoring/v4.0.1/katalog/prometheus-operator/crds/0servicemonitorCustomResourceDefinition.yaml
+        kubectl apply -f https://raw.githubusercontent.com/sighupio/module-monitoring/v4.0.1/katalog/prometheus-operator/crds/0prometheusruleCustomResourceDefinition.yaml
     }
     run crds
     [ "$status" -eq 0 ]

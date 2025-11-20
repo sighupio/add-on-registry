@@ -1,0 +1,22 @@
+[tools]
+"ubi:google/addlicense" = "v1.1.1"
+
+[tasks.license-check]
+description = "check license headers"
+run = """
+addlicense -c "SIGHUP s.r.l" -y 2017-present -v -l bsd \
+  -ignore 'templates/distribution/**' \
+  -ignore 'target/**' \
+  -ignore 'vendor/**' \
+  --check .
+"""
+
+[tasks.license-add]
+description = "add license headers to source files"
+run = """
+addlicense -c "SIGHUP s.r.l" -y 2017-present -v -l bsd \
+  -ignore 'templates/distribution/**' \
+  -ignore 'target/**' \
+  -ignore 'vendor/**' \
+  .
+"""

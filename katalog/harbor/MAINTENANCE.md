@@ -1,28 +1,62 @@
 # Development notes
+
 ## How to update
+
 Harbor distributes itself as a Helm chart.
 
 ### Look for the target version
+
 Search the Chart version that you'll need with
+
 ```bash
+helm repo add harbor https://helm.goharbor.io
+helm repo update
 helm search repo harbor/harbor --versions
 ```
+
 ### Download and template the Helm Chart
+
 ```bash
-helm template harbor harbor/harbor --version <helm-chart-version> --output-dir <custom-directory>
+VERSION=v1.15.2 #v2.11.2
+rm -rf vendor
+helm template harbor harbor/harbor --version $VERSION -f MAINTENANCE.values.yaml --output-dir vendor
+for file in $(find ./vendor -type f \( -name "*.yaml" -o -name "*.yml" \)); do
+  yq -i 'del(.metadata.labels, .spec.selector, .spec.template.metadata)' $file
+done
 ```
 
 ### Check the diff and update the images
+
 At this point you should check the differences and adapt them. Keep in mind that you will probably need to update images in the SIGHUP registry.
 
-## Service monitor manifests
+The Helm chart generates the same foldering that we maintain, so you will need to compare manifests inside each folder.
 
-The service monitor manifests `katalog/harbor/exporter/sm.yml` file has been templated from:
+#### General notes
 
-- <https://github.com/goharbor/harbor-helm/blob/master/templates/metrics/metrics-svcmon.yaml>
-- <https://goharbor.io/docs/2.7.0/administration/metrics/>
+- we prefer to generate secrets and configmaps using Kustomize generators
+- we delete all labels from the upstream-generated manifests and set them with Kustomize, with the exception of some CustomResource ( es. ServiceMonitor ) or fields ( volumeClaimTemplates ) 
+- we rewrite all images and tags using Kustomize, pointing to our registry - remember to pull new images!
+- we stripped all of the resources from the Helm Chart's release Name prefix, which is "harbor-" by default ( es. "harbor-core" and "harbor-registry" Deployment and ConfigMap become "core" and "registry" in our manifests ). Remember to change accordingly both the resources' names, and the configurations that reference them!
+
+#### Config maps
+
+We generate CMs using Kustomize's `configMapGenerator`, so you will need to port all Helm configmaps into each `kustomization.yaml`.
+
+We also prefer to use the `files` options when possible (e.g.: in `portal` the `nginx.conf` is placed inside `config/nginx.conf` and imported in the CM with Kustomize)
+
+### Secrets
+
+- the `JOBSERVICE_SECRET` key has been renamed to `secret` inside the `jobservice` secret
+
+### Service monitor manifests
+
+The service monitor manifests `katalog/harbor/exporter/sm.yml` file will be found at `vendor/metrics/metrics-svcmon.yaml`, as usual check for differences.
 
 Once deployed, you will be able to find a `serviceMonitor` Prometheus Operator resources. It is required to allow prometheus to fetch the metrics exposed by Harbor
+
+### Ingress manifest
+
+The Ingress manifest `katalog/harbor/distributions/common/ingress.yml` will be found at `vendor/ingress/ingress.yaml`, as usual check for differences.
 
 ### Demos / Testing
 
@@ -41,7 +75,7 @@ All the following examples are tested in the pipeline
 
 The Grafana dashboard found in `katalog/harbor/exporter/dashboards` was taken from:
 
-- [Harbor Metrics](https://github.com/goharbor/harbor/blob/main/contrib/grafana-dashborad/metrics-example.json)
+- [Harbor Metrics](https://github.com/goharbor/harbor/blob/main/contrib/grafana-dashboard/metrics-example.json)
 
 Compared to the official dashboards, the following changes have been made:
 
@@ -65,4 +99,4 @@ yq e '.spec.groups[] | .rules[] |  "| " + .alert + " | " + (.annotations.summary
 
 ### Trivy Database Update Offline
 
-The trivy configuration has been updated to download the new image with the updated vulnerability database every night. To do this we have added: [an image that is built every night](https://github.com/sighupio/trivy-adapter-photon-offline), an ad-hoc rbac and a cronjob to restart the pod. The new image is downloaded from the following [repository](https://quay.io/repository/sighup/trivy-adapter-photon-offline?tab=tags).
+The trivy configuration has been updated to download the new image with the updated vulnerability database every night. To do this we have added: [an image that is built every night](https://github.com/sighupio/container-image-sync/blob/main/modules/registry/custom/trivy-adapter-photon-offline/Dockerfile), an ad-hoc rbac and a cronjob to restart the pod. The new image is downloaded from the following [repository](https://registry.sighup.io/harbor/projects/37/repositories/goharbor%2Ftrivy-adapter-photon-offline/artifacts-tab?publicAndNotLogged=yes).

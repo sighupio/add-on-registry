@@ -7,9 +7,6 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: registry
-  labels:
-    app: harbor
-    component: registry
 spec:
   accessModes:
     - ReadWriteOnce

@@ -2,17 +2,8 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
----
+$patch: delete
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: pvc-job-scandata-exports
-  labels:
-    app: harbor
-    component: jobservice
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
+  name: registry

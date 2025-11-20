@@ -1,0 +1,43 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: harbor-db-restore
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      securityContext:
+        fsGroup: 26
+      restartPolicy: OnFailure
+      containers:
+        - name: restore
+          image: registry.sighup.io/pgw/postgresql:17.5
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              echo "Starting restore to CloudNativePG..."
+              PGPASSWORD="${DST_DB_PASSWORD}" pg_restore \
+                --host=${DST_DB_HOST} \
+                --port=${DST_DB_PORT:-5432} \
+                --username=${DST_DB_USER} \
+                --dbname=${DST_DB_NAME} \
+                --clean \
+                --if-exists \
+                --no-password \
+                --verbose \
+                /backup/harbor-final.dump
+              echo "Restore complete."
+          envFrom:
+            - secretRef:
+                name: db-migration-env
+          volumeMounts:
+            - name: backup
+              mountPath: /backup
+      volumes:
+        - name: backup
+          persistentVolumeClaim:
+            claimName: harbor-db-backup-pvc

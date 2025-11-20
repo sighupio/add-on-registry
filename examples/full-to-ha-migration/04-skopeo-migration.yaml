@@ -1,0 +1,80 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: skopeo-migration
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: skopeo-migrator
+          image: quay.io/skopeo/stable:latest
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              set -euo pipefail
+
+              CONCURRENCY="${CONCURRENCY:-4}"
+
+              echo "Installing utilities..."
+              microdnf install -y jq curl && microdnf clean all
+
+              echo "=== Discovering projects from $SRC_URL ==="
+              projects=($(curl -k -s -u $SRC_CREDS "https://$SRC_URL/api/v2.0/projects?page_size=100" | jq -r '.[].name'))
+
+              migrate_repo() {
+                local repo="$1"
+                echo "[START] $repo"
+                tags=($(skopeo list-tags docker://$SRC_URL/$repo --creds $SRC_CREDS --tls-verify=false | jq -r '.Tags[]'))
+                for tag in "${tags[@]}"; do
+                  echo "migrating $repo:$tag"
+                  if skopeo copy --all \
+                    --src-creds "$SRC_CREDS" \
+                    --dest-creds "$DST_CREDS" \
+                    "docker://$SRC_URL/$repo:$tag" \
+                    "docker://$DST_URL/$repo:$tag" \
+                    --src-tls-verify=false \
+                    --dest-tls-verify=false; then
+                    echo "[OK] $repo:$tag" >> /report/success.log
+                  else
+                    echo "[FAIL] $repo:$tag" >> /report/fail.log
+                  fi
+                done
+              }
+
+              mkdir -p /report
+              echo "=== Migrating all repositories (max $CONCURRENCY parallel) ==="
+
+              for project in "${projects[@]}"; do
+                echo "--- Project: $project ---"
+                repos=($(curl -k -s -u $SRC_CREDS "https://$SRC_URL/api/v2.0/projects/$project/repositories?page_size=100" | jq -r '.[].name'))
+                for repo in "${repos[@]}"; do
+                  migrate_repo "$repo" &
+                  # Limit concurrency
+                  while [ "$(jobs | wc -l)" -ge "$CONCURRENCY" ]; do sleep 2; done
+                done
+              done
+              wait
+
+              echo "=== Migration completed ==="
+              echo "--- Successful repositories ---"
+              cat /report/success.log || true
+              echo "--- Failed repositories ---"
+              cat /report/fail.log || true
+          env:
+            - name: CONCURRENCY
+              value: "4"
+          envFrom:
+            - secretRef:
+                name: db-migration-env
+          volumeMounts:
+            - name: report
+              mountPath: /report
+      volumes:
+        - name: report
+          emptyDir: {}

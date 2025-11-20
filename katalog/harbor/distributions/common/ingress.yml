@@ -10,11 +10,11 @@ metadata:
   labels:
     app: harbor
   annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
     ingress.kubernetes.io/proxy-body-size: "0"
     ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    cert-manager.io/cluster-issuer: "letsencrypt-staging"
 spec:
   tls:
     - secretName: harbor-ingress-cert
@@ -23,13 +23,6 @@ spec:
   rules:
     - http:
         paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: portal
-                port:
-                  number: 80
           - path: /api/
             pathType: Prefix
             backend:
@@ -63,6 +56,13 @@ spec:
             backend:
               service:
                 name: core
+                port:
+                  name: http-web
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: portal
                 port:
                   name: http-web
       host: core.harbor.domain

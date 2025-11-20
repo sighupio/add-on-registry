@@ -5,12 +5,16 @@
 ---
 version: 0.1
 log:
-  level: debug
+  level: info
   fields:
     service: registry
 storage:
-  filesystem:
-    rootdirectory: /storage
+  s3:
+    region: "%YOUR_OBJECT_STORAGE_REGION%"
+    bucket: "%YOUR_OBJECT_STORAGE_BUCKET%"
+    regionendpoint: "%YOUR_OBJECT_STORAGE_ENDPOINT%"
+    skipverify: %YOUR_OBJECT_STORAGE_SKIP_VERIFY%
+    secure: %YOUR_OBJECT_STORAGE_HTTPS%
   cache:
     layerinfo: redis
   maintenance:
@@ -24,12 +28,16 @@ storage:
   redirect:
     disable: false
 redis:
-  addr: "redis:6379"
+  addr: "%YOUR_REDIS_HOSTS%"
+  sentinelMasterSet: "%YOUR_REDIS_MASTER_SET%"
   db: 2
-  password:
   readtimeout: 10s
   writetimeout: 10s
   dialtimeout: 10s
+  pool:
+    maxidle: 100
+    maxactive: 500
+    idletimeout: 60s
 http:
   addr: :5000
   relativeurls: false
@@ -46,24 +54,6 @@ auth:
     path: /etc/registry/passwd
 validation:
   disabled: true
-notifications:
-  endpoints:
-    - name: harbor
-      disabled: false
-      url: http://core/service/notifications
-      timeout: 3000ms
-      threshold: 5
-      backoff: 1s
-      ignoredmediatypes:
-        - application/vnd.docker.image.rootfs.diff.tar.gzip
-        - application/vnd.docker.image.rootfs.foreign.diff.tar.gzip
-        - application/vnd.oci.image.layer.v1.tar
-        - application/vnd.oci.image.layer.v1.tar+gzip
-        - application/vnd.oci.image.layer.v1.tar+zstd
-        - application/vnd.oci.image.layer.nondistributable.v1.tar
-        - application/vnd.oci.image.layer.nondistributable.v1.tar+gzip
-        - application/vnd.oci.image.layer.nondistributable.v1.tar+zstd
-        - application/octet-stream
 compatibility:
   schema1:
     enabled: true

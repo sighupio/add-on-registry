@@ -1,0 +1,41 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: harbor-db-dump
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        fsGroup: 26
+      initContainers:
+        - name: fix-perms
+          image: busybox
+          command: ["sh", "-c", "chown -R 26:26 /backup"]
+          volumeMounts:
+            - name: backup
+              mountPath: /backup
+      containers:
+        - name: dump
+          image: registry.sighup.io/pgw/postgresql:17.5
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              echo "Starting dump of external Harbor DB..."
+              PGPASSWORD="${SRC_DB_PASSWORD}" pg_dump -h ${SRC_DB_HOST} -U ${SRC_DB_USER} -Fc --no-owner --no-acl ${SRC_DB_NAME} --verbose > /backup/harbor-final.dump
+              echo "Dump complete, saved to /backup/harbor-final.dump"
+          envFrom:
+            - secretRef:
+                name: db-migration-env
+          volumeMounts:
+            - name: backup
+              mountPath: /backup
+      volumes:
+        - name: backup
+          persistentVolumeClaim:
+            claimName: harbor-db-backup-pvc

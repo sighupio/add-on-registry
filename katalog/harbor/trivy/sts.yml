@@ -19,7 +19,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: trivy
-          image: goharbor/trivy-adapter-photon
+          image: goharbor/trivy-adapter-photon:v2.11.2
           imagePullPolicy: Always
           securityContext:
             privileged: false

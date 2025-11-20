@@ -1,0 +1,40 @@
+# Copyright (c) 2017-present SIGHUP s.r.l All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: registry
+
+resources:
+  - ../common
+
+patches:
+  - target:
+      kind: Deployment|StatefulSet
+      name: trivy|core|jobservice|portal|registry
+    patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 2
+  - path: ./patch/jobservice/delete-pvc.yaml
+  - path: ./patch/jobservice/deployment.yaml
+  - path: ./patch/registry/delete-pvc.yaml
+  - path: ./patch/registry/deployment.yaml
+configMapGenerator:
+  - name: registry
+    behavior: merge
+    files:
+      - config.yml=config/registry/config.yml
+  - name: jobservice
+    behavior: merge
+    files:
+      - config.yml=config/jobservice/config.yml
+secretGenerator:
+  - name: registry
+    behavior: merge
+    literals:
+      - REGISTRY_STORAGE_S3_ACCESSKEY="accesskey"
+      - REGISTRY_STORAGE_S3_SECRETKEY="secretkey"

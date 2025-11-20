@@ -13,7 +13,7 @@ spec:
   endpoints:
     - honorLabels: true
       port: http-metrics
-  jobLabel: app.kubernetes.io/name
+  jobLabel: app
   selector:
     matchLabels:
       app: harbor

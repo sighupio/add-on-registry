@@ -15,7 +15,6 @@ resources:
 images:
   - name: goharbor/harbor-core
     newName: registry.sighup.io/fury/goharbor/harbor-core
-    newTag: v2.9.5
 
 configMapGenerator:
   - name: core
@@ -55,10 +54,9 @@ configMapGenerator:
       - METRIC_SUBSYSTEM=core
       - HTTP_PROXY=
       - HTTPS_PROXY=
-      - NO_PROXY=core,jobservice,database,chartmuseum,trivy,notary-server,notary-signer,registry,portal,exporter,127.0.0.1,localhost,.local,.internal
-      - PERMITTED_REGISTRY_TYPES_FOR_PROXY_CACHE=docker-hub,harbor,azure-acr,aws-ecr,google-gcr,quay,docker-registry,jfrog-artifactory
+      - NO_PROXY=core,jobservice,database,registry,portal,trivy,exporter,127.0.0.1,localhost,.local,.internal
+      - PERMITTED_REGISTRY_TYPES_FOR_PROXY_CACHE=docker-hub,harbor,azure-acr,aws-ecr,google-gcr,quay,docker-registry,github-ghcr,jfrog-artifactory
       - QUOTA_UPDATE_PROVIDER=db
-
 secretGenerator:
   - name: core
     literals:
@@ -68,3 +66,9 @@ secretGenerator:
       - POSTGRESQL_PASSWORD=changeit
       - CSRF_KEY=QQRqXf3yTEtceQDS6NMY9F777LZ4bqKt
       - REGISTRY_CREDENTIAL_PASSWORD=DhQTxjwUAyUZHaMABvm90dGAJMDX5jaa
+
+labels:
+  - includeSelectors: true
+    pairs:
+      app: harbor
+      component: core

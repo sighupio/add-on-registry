@@ -11,3 +11,4 @@ namespace: registry
 resources:
   - ../common
   - ../../database
+  - ../../redis

@@ -13,7 +13,6 @@ resources:
   - ../../core
   - ../../jobservice
   - ../../portal
-  - ../../redis
   - ../../registry
   - ../../exporter
   - ingress.yml

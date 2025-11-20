@@ -10,3 +10,4 @@ namespace: registry
 
 resources:
   - ../common
+  - ../../redis

@@ -7,21 +7,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: core
-  labels:
-    app: harbor
-    component: core
-    app.kubernetes.io/component: core
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      app: harbor
-      component: core
+  revisionHistoryLimit: 10
   template:
-    metadata:
-      labels:
-        app: harbor
-        component: core
     spec:
       securityContext:
         runAsUser: 10000
@@ -30,7 +19,7 @@ spec:
       terminationGracePeriodSeconds: 120
       containers:
         - name: core
-          image: goharbor/harbor-core
+          image: goharbor/harbor-core:v2.11.2
           imagePullPolicy: Always
           startupProbe:
             httpGet:
@@ -52,7 +41,6 @@ spec:
               path: /api/v2.0/ping
               scheme: HTTP
               port: 8080
-            initialDelaySeconds: 20
             failureThreshold: 2
             periodSeconds: 10
           resources:
@@ -75,6 +63,15 @@ spec:
                 secretKeyRef:
                   name: jobservice
                   key: secret
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           ports:
             - containerPort: 8080
           volumeMounts:
