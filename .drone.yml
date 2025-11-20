@@ -595,7 +595,7 @@ steps:
     image: alpine:latest
     pull: always
     commands:
-      - sh ./katalog/tests/harbor/config/generate-template.sh v1.33.4
+      - sh ./katalog/tests/harbor/config/generate-template.sh v1.33.2
 
   - name: create-kind-cluster
     image: quay.io/sighup/dind-kind-kubectl-kustomize:0.29.0_1.33.4_5.6.0
@@ -606,9 +606,9 @@ steps:
       - name: dockersock
         path: /var/run/docker.sock
     environment:
-      CLUSTER_VERSION: v1.33.4
-      KUBECONFIG: kubeconfig-harbor-v1.33.4
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.33.4
+      CLUSTER_VERSION: v1.33.2
+      KUBECONFIG: kubeconfig-harbor-v1.33.2
+      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.33.2
     commands:
       - kind create cluster --name $${CLUSTER_NAME} --image registry.sighup.io/fury/kindest/node:$${CLUSTER_VERSION} --config ./config-$${CLUSTER_NAME}.yaml
       - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
@@ -618,8 +618,8 @@ steps:
     pull: always
     network_mode: host
     environment:
-      KUBECONFIG: kubeconfig-harbor-v1.33.4
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.33.4
+      KUBECONFIG: kubeconfig-harbor-v1.33.2
+      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.33.2
       # Using nip.io DNS wildcard service to resolve <harbor-domain>.127.0.0.1.nip.io to localhost where Kind exposes services.
       TEST_DOMAIN: "127.0.0.1.nip.io"
       FURYCTL_VERSION: v0.33.1
@@ -637,8 +637,8 @@ steps:
     pull: always
     network_mode: host
     environment:
-      KUBECONFIG: kubeconfig-harbor-v1.33.4
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.33.4
+      KUBECONFIG: kubeconfig-harbor-v1.33.2
+      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.33.2
       TEST_DOMAIN: "127.0.0.1.nip.io"
     depends_on:
       - e2e-setup
@@ -651,8 +651,8 @@ steps:
     pull: always
     network_mode: host
     environment:
-      KUBECONFIG: kubeconfig-harbor-v1.33.4
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.33.4
+      KUBECONFIG: kubeconfig-harbor-v1.33.2
+      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.33.2
       TEST_DOMAIN: "127.0.0.1.nip.io"
     depends_on:
       - e2e-setup
@@ -668,8 +668,8 @@ steps:
       - name: dockersock
         path: /var/run/docker.sock
     environment:
-      KUBECONFIG: kubeconfig-harbor-v1.33.4
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.33.4
+      KUBECONFIG: kubeconfig-harbor-v1.33.2
+      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.33.2
       TEST_DOMAIN: "127.0.0.1.nip.io"
     depends_on:
       - e2e-setup
@@ -683,7 +683,7 @@ steps:
       - name: dockersock
         path: /var/run/docker.sock
     environment:
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.33.4
+      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.33.2
     commands:
       - kind delete cluster --name $${CLUSTER_NAME} || true
     depends_on:
