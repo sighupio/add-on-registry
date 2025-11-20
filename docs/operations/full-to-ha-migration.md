@@ -354,15 +354,13 @@ curl -k -u "admin:<PASSWORD>" -X PUT \
 
 ### Step 5: Migrate Container Images
 
-Use Skopeo to copy all container images from the old registry to the new one.
-
 #### 5.1 Start Image Migration
 
 You can use [Harbor's Replication feature](https://goharbor.io/docs/2.14.0/administration/configuring-replication/create-replication-endpoints/) to migrate all images from the old registry to the HA one.
 
 ##### Alternative approach
 
-If, for some reason, it fails to migrate images uysing Replications, you could also use the `04-skopeo-migration.yaml` manifest to trigger a more manual approach:
+If, for some reason, the Replication feature fails to migrate images, you could also use the `04-skopeo-migration.yaml` manifest to trigger a more manual approach using Skopeo:
 
 ```bash
 # Apply skopeo migration job
