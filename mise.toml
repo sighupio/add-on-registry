@@ -6,6 +6,8 @@ pluto = "5.22.6"
 furyctl = "0.33.1"
 bats = "1.11.0"
 "ubi:google/addlicense" = "v1.1.1"
+"ubi:lework/skopeo-binary" = {version="1.20.0", rename_exe="skopeo"}
+jq = "1.8.1"
 
 [tasks.license-check]
 description = "check license headers"
