@@ -1,6 +1,6 @@
 [tools]
 # GitHub releases
-kustomize = "5.8.0"
+kustomize = "5.6.0"
 kind = "0.30.0"
 pluto = "5.22.6"
 furyctl = "0.33.1"
