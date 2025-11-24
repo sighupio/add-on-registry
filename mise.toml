@@ -30,6 +30,7 @@ addlicense -c "SIGHUP s.r.l" -y 2017-present -v -l bsd \
 [tasks.create-kind-cluster]
 run = """
 CLUSTER_NAME="${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-${CLUSTER_VERSION}"
+. ./env-${CLUSTER_NAME}.env
 kind create cluster --name ${CLUSTER_NAME} --image registry.sighup.io/fury/kindest/node:${CLUSTER_VERSION} --config ./config-${CLUSTER_NAME}.yaml
 kind get kubeconfig --name ${CLUSTER_NAME} > ${KUBECONFIG}
 """
