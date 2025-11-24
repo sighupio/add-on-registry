@@ -2,61 +2,89 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-name: license
+name: qa
 kind: pipeline
 type: docker
 
-clone:
-  depth: 1
-
-steps:
-  - name: check
-    image: docker.io/library/golang:1.20
-    pull: always
-    commands:
-      - go install github.com/google/addlicense@v1.1.1
-      - addlicense -c "SIGHUP s.r.l" -v -l bsd --check .
-
----
-name: policeman
-kind: pipeline
-type: docker
-
-clone:
-  depth: 1
+node:
+   performance: low
 
 platform:
   os: linux
   arch: amd64
 
-depends_on:
-  - license
+clone:
+  depth: 1
 
-steps:
-  - name: render
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
+environment:
+  MISE_DATA_DIR: /mise-data
+
+volumes:
+  - name: mise-cache
+    host:
+      path: /root/mise_data_dir
+
+steps: # qa
+  - name: install-tools
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - mise install
+      - eval "$(mise activate bash --shims)"
+
+  - name: license-check
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     depends_on:
-      - clone
+      - install-tools
+    volumes:
+      - name: mise-cache
+        path: /mise-data
     commands:
+      - eval "$(mise activate bash --shims)"
+      - mise run license-check
+
+  - name: render
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    depends_on:
+      - license-check
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - eval "$(mise activate bash --shims)"
       - kustomize build katalog/harbor/distributions/full-harbor > distribution.yml
 
   - name: check-deprecated-apis
-    image: us-docker.pkg.dev/fairwinds-ops/oss/pluto:v5
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     depends_on:
       - render
+    volumes:
+      - name: mise-cache
+        path: /mise-data
     commands:
-      # Using --ignore-deprecations because we don't want the CI to fail when the API has not been removed yet.
-      - /pluto detect distribution.yml --ignore-deprecations --target-versions=k8s=v1.33.0
+      - eval "$(mise activate bash --shims)"
+      # we use --ignore-deprecations because we don't want the CI to fail when the API has not been removed yet.
+      - pluto detect distribution.yml --ignore-deprecations --target-versions=k8s=v1.33.0
 
 ---
+
 name: e2e-kubernetes-1.29
 kind: pipeline
 type: docker
 
+environment:
+  CLUSTER_VERSION: v1.29.0
+  MISE_DATA_DIR: /mise-data
+  TEST_DOMAIN: "127.0.0.1.nip.io"
+
 depends_on:
-  - policeman
+  - qa
 
 clone:
   depth: 1
@@ -70,101 +98,110 @@ trigger:
     include:
       - refs/tags/**
 
+volumes:
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock
+  - name: mise-cache
+    host:
+      path: /root/mise_data_dir
+
 steps:
   - name: generate-kind-config
     image: alpine:latest
     pull: always
     commands:
-      - sh ./katalog/tests/harbor/config/generate-template.sh v1.29.0
+      - sh ./katalog/tests/harbor/config/generate-template.sh $${CLUSTER_VERSION}
+
+  - name: install-tools
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - mise install
+      - mise use kubectl@$${CLUSTER_VERSION}
+      - eval "$(mise activate bash --shims)"
 
   - name: create-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     depends_on:
-      - clone
+      - install-tools
+      - generate-kind-config
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
-    environment:
-      CLUSTER_VERSION: v1.29.0
-      KUBECONFIG: kubeconfig-harbor-v1.29.0
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.29.0
+      - name: mise-cache
+        path: /mise-data
     commands:
-      - kind create cluster --name $${CLUSTER_NAME} --image registry.sighup.io/fury/kindest/node:$${CLUSTER_VERSION} --config ./config-$${CLUSTER_NAME}.yaml
-      - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
+      - eval "$(mise activate bash --shims)"
+      - mise run create-kind-cluster
 
   - name: e2e-setup
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.29.1_5.6.0_4.33.3
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.29.0
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.29.0
-      TEST_DOMAIN: "127.0.0.1.nip.io"
-      FURYCTL_VERSION: v0.32.1
+    volumes:
+      - name: mise-cache
+        path: /mise-data
     depends_on:
       - create-kind-cluster
     commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-$(uname -s)-amd64.tar.gz" -o /tmp/furyctl.tar.gz && tar xfz /tmp/furyctl.tar.gz -C /tmp
-      - mv /tmp/furyctl /usr/local/bin/furyctl && chmod +x /usr/local/bin/furyctl
-      - until kubectl get serviceaccount default > /dev/null 2>&1; do echo "waiting for control-plane" && sleep 1; done
-      - bats -t katalog/tests/harbor/setup.sh
+      - eval "$(mise activate bash --shims)"
+      - mise run e2e-setup
 
   - name: e2e-vulns
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.29.1_5.6.0_4.33.3
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.29.0
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.29.0
-      TEST_DOMAIN: "127.0.0.1.nip.io"
+    volumes:
+      - name: mise-cache
+        path: /mise-data
     depends_on:
       - e2e-setup
     commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - bats -t katalog/tests/harbor/vulns.sh
+      - eval "$(mise activate bash --shims)"
+      - mise run e2e-vulns
 
   - name: e2e-replication
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.29.1_5.6.0_4.33.3
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.29.0
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.29.0
-      TEST_DOMAIN: "127.0.0.1.nip.io"
+    volumes:
+      - name: mise-cache
+        path: /mise-data
     depends_on:
       - e2e-setup
     commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - bats -t katalog/tests/harbor/replication.sh
+      - eval "$(mise activate bash --shims)"
+      - mise run e2e-replication
 
   - name: e2e-registry
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.29.1_5.6.0_4.33.3
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
     volumes:
-      - name: dockersock
-        path: /var/run/docker.sock
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.29.0
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.29.0
-      TEST_DOMAIN: "127.0.0.1.nip.io"
+      - name: mise-cache
+        path: /mise-data
     depends_on:
       - e2e-setup
     commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - bats -t katalog/tests/harbor/registry.sh
+      - eval "$(mise activate bash --shims)"
+      - mise run e2e-registry
 
   - name: delete-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
-    environment:
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.29.0
+      - name: mise-cache
+        path: /mise-data
     commands:
-      - kind delete cluster --name $${CLUSTER_NAME} || true
+      - eval "$(mise activate bash --shims)"
+      - mise run delete-kind-cluster
     depends_on:
       - e2e-vulns
       - e2e-replication
@@ -174,19 +211,19 @@ steps:
         - success
         - failure
 
-volumes:
-  - name: dockersock
-    host:
-      path: /var/run/docker.sock
-
 ---
+
 name: e2e-kubernetes-1.30
 kind: pipeline
 type: docker
 
+environment:
+  CLUSTER_VERSION: v1.30.4
+  MISE_DATA_DIR: /mise-data
+  TEST_DOMAIN: "127.0.0.1.nip.io"
+
 depends_on:
-  - policeman
-  - e2e-kubernetes-1.29
+  - qa
 
 clone:
   depth: 1
@@ -200,101 +237,110 @@ trigger:
     include:
       - refs/tags/**
 
+volumes:
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock
+  - name: mise-cache
+    host:
+      path: /root/mise_data_dir
+
 steps:
   - name: generate-kind-config
     image: alpine:latest
     pull: always
     commands:
-      - sh ./katalog/tests/harbor/config/generate-template.sh v1.30.4
+      - sh ./katalog/tests/harbor/config/generate-template.sh $${CLUSTER_VERSION}
+
+  - name: install-tools
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - mise install
+      - mise use kubectl@$${CLUSTER_VERSION}
+      - eval "$(mise activate bash --shims)"
 
   - name: create-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     depends_on:
-      - clone
+      - install-tools
+      - generate-kind-config
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
-    environment:
-      CLUSTER_VERSION: v1.30.4
-      KUBECONFIG: kubeconfig-harbor-v1.30.4
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.30.4
+      - name: mise-cache
+        path: /mise-data
     commands:
-      - kind create cluster --name $${CLUSTER_NAME} --image registry.sighup.io/fury/kindest/node:$${CLUSTER_VERSION} --config ./config-$${CLUSTER_NAME}.yaml
-      - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
+      - eval "$(mise activate bash --shims)"
+      - mise run create-kind-cluster
 
   - name: e2e-setup
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.30.5_5.6.0_4.33.3
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.30.4
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.30.4
-      TEST_DOMAIN: "127.0.0.1.nip.io"
-      FURYCTL_VERSION: v0.32.1
+    volumes:
+      - name: mise-cache
+        path: /mise-data
     depends_on:
       - create-kind-cluster
     commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-$(uname -s)-amd64.tar.gz" -o /tmp/furyctl.tar.gz && tar xfz /tmp/furyctl.tar.gz -C /tmp
-      - mv /tmp/furyctl /usr/local/bin/furyctl && chmod +x /usr/local/bin/furyctl
-      - until kubectl get serviceaccount default > /dev/null 2>&1; do echo "waiting for control-plane" && sleep 1; done
-      - bats -t katalog/tests/harbor/setup.sh
+      - eval "$(mise activate bash --shims)"
+      - mise run e2e-setup
 
   - name: e2e-vulns
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.30.5_5.6.0_4.33.3
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.30.4
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.30.4
-      TEST_DOMAIN: "127.0.0.1.nip.io"
+    volumes:
+      - name: mise-cache
+        path: /mise-data
     depends_on:
       - e2e-setup
     commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - bats -t katalog/tests/harbor/vulns.sh
+      - eval "$(mise activate bash --shims)"
+      - mise run e2e-vulns
 
   - name: e2e-replication
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.30.5_5.6.0_4.33.3
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.30.4
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.30.4
-      TEST_DOMAIN: "127.0.0.1.nip.io"
+    volumes:
+      - name: mise-cache
+        path: /mise-data
     depends_on:
       - e2e-setup
     commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - bats -t katalog/tests/harbor/replication.sh
+      - eval "$(mise activate bash --shims)"
+      - mise run e2e-replication
 
   - name: e2e-registry
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.30.5_5.6.0_4.33.3
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
     volumes:
-      - name: dockersock
-        path: /var/run/docker.sock
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.30.4
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.30.4
-      TEST_DOMAIN: "127.0.0.1.nip.io"
+      - name: mise-cache
+        path: /mise-data
     depends_on:
       - e2e-setup
     commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - bats -t katalog/tests/harbor/registry.sh
+      - eval "$(mise activate bash --shims)"
+      - mise run e2e-registry
 
   - name: delete-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
-    environment:
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.30.4
+      - name: mise-cache
+        path: /mise-data
     commands:
-      - kind delete cluster --name $${CLUSTER_NAME} || true
+      - eval "$(mise activate bash --shims)"
+      - mise run delete-kind-cluster
     depends_on:
       - e2e-vulns
       - e2e-replication
@@ -304,19 +350,19 @@ steps:
         - success
         - failure
 
-volumes:
-  - name: dockersock
-    host:
-      path: /var/run/docker.sock
-
 ---
+
 name: e2e-kubernetes-1.31
 kind: pipeline
 type: docker
 
+environment:
+  CLUSTER_VERSION: v1.31.0
+  MISE_DATA_DIR: /mise-data
+  TEST_DOMAIN: "127.0.0.1.nip.io"
+
 depends_on:
-  - policeman
-  - e2e-kubernetes-1.30
+  - qa
 
 clone:
   depth: 1
@@ -330,101 +376,110 @@ trigger:
     include:
       - refs/tags/**
 
+volumes:
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock
+  - name: mise-cache
+    host:
+      path: /root/mise_data_dir
+
 steps:
   - name: generate-kind-config
     image: alpine:latest
     pull: always
     commands:
-      - sh ./katalog/tests/harbor/config/generate-template.sh v1.31.0
+      - sh ./katalog/tests/harbor/config/generate-template.sh $${CLUSTER_VERSION}
+
+  - name: install-tools
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - mise install
+      - mise use kubectl@$${CLUSTER_VERSION}
+      - eval "$(mise activate bash --shims)"
 
   - name: create-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     depends_on:
-      - clone
+      - install-tools
+      - generate-kind-config
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
-    environment:
-      CLUSTER_VERSION: v1.31.0
-      KUBECONFIG: kubeconfig-harbor-v1.31.0
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.31.0
+      - name: mise-cache
+        path: /mise-data
     commands:
-      - kind create cluster --name $${CLUSTER_NAME} --image registry.sighup.io/fury/kindest/node:$${CLUSTER_VERSION} --config ./config-$${CLUSTER_NAME}.yaml
-      - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
+      - eval "$(mise activate bash --shims)"
+      - mise run create-kind-cluster
 
   - name: e2e-setup
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.31.0
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.31.0
-      TEST_DOMAIN: "127.0.0.1.nip.io"
-      FURYCTL_VERSION: v0.32.1
+    volumes:
+      - name: mise-cache
+        path: /mise-data
     depends_on:
       - create-kind-cluster
     commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-$(uname -s)-amd64.tar.gz" -o /tmp/furyctl.tar.gz && tar xfz /tmp/furyctl.tar.gz -C /tmp
-      - mv /tmp/furyctl /usr/local/bin/furyctl && chmod +x /usr/local/bin/furyctl
-      - until kubectl get serviceaccount default > /dev/null 2>&1; do echo "waiting for control-plane" && sleep 1; done
-      - bats -t katalog/tests/harbor/setup.sh
+      - eval "$(mise activate bash --shims)"
+      - mise run e2e-setup
 
   - name: e2e-vulns
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.31.0
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.31.0
-      TEST_DOMAIN: "127.0.0.1.nip.io"
+    volumes:
+      - name: mise-cache
+        path: /mise-data
     depends_on:
       - e2e-setup
     commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - bats -t katalog/tests/harbor/vulns.sh
+      - eval "$(mise activate bash --shims)"
+      - mise run e2e-vulns
 
   - name: e2e-replication
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.31.0
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.31.0
-      TEST_DOMAIN: "127.0.0.1.nip.io"
+    volumes:
+      - name: mise-cache
+        path: /mise-data
     depends_on:
       - e2e-setup
     commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - bats -t katalog/tests/harbor/replication.sh
+      - eval "$(mise activate bash --shims)"
+      - mise run e2e-replication
 
   - name: e2e-registry
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
     volumes:
-      - name: dockersock
-        path: /var/run/docker.sock
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.31.0
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.31.0
-      TEST_DOMAIN: "127.0.0.1.nip.io"
+      - name: mise-cache
+        path: /mise-data
     depends_on:
       - e2e-setup
     commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - bats -t katalog/tests/harbor/registry.sh
+      - eval "$(mise activate bash --shims)"
+      - mise run e2e-registry
 
   - name: delete-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
-    environment:
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.31.0
+      - name: mise-cache
+        path: /mise-data
     commands:
-      - kind delete cluster --name $${CLUSTER_NAME} || true
+      - eval "$(mise activate bash --shims)"
+      - mise run delete-kind-cluster
     depends_on:
       - e2e-vulns
       - e2e-replication
@@ -434,19 +489,19 @@ steps:
         - success
         - failure
 
-volumes:
-  - name: dockersock
-    host:
-      path: /var/run/docker.sock
-
 ---
+
 name: e2e-kubernetes-1.32
 kind: pipeline
 type: docker
 
+environment:
+  CLUSTER_VERSION: v1.32.2
+  MISE_DATA_DIR: /mise-data
+  TEST_DOMAIN: "127.0.0.1.nip.io"
+
 depends_on:
-  - policeman
-  - e2e-kubernetes-1.31
+  - qa
 
 clone:
   depth: 1
@@ -460,101 +515,110 @@ trigger:
     include:
       - refs/tags/**
 
+volumes:
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock
+  - name: mise-cache
+    host:
+      path: /root/mise_data_dir
+
 steps:
   - name: generate-kind-config
     image: alpine:latest
     pull: always
     commands:
-      - sh ./katalog/tests/harbor/config/generate-template.sh v1.32.2
+      - sh ./katalog/tests/harbor/config/generate-template.sh $${CLUSTER_VERSION}
+
+  - name: install-tools
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - mise install
+      - mise use kubectl@$${CLUSTER_VERSION}
+      - eval "$(mise activate bash --shims)"
 
   - name: create-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     depends_on:
-      - clone
+      - install-tools
+      - generate-kind-config
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
-    environment:
-      CLUSTER_VERSION: v1.32.2
-      KUBECONFIG: kubeconfig-harbor-v1.32.2
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.32.2
+      - name: mise-cache
+        path: /mise-data
     commands:
-      - kind create cluster --name $${CLUSTER_NAME} --image registry.sighup.io/fury/kindest/node:$${CLUSTER_VERSION} --config ./config-$${CLUSTER_NAME}.yaml
-      - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
+      - eval "$(mise activate bash --shims)"
+      - mise run create-kind-cluster
 
   - name: e2e-setup
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.32.2
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.32.2
-      TEST_DOMAIN: "127.0.0.1.nip.io"
-      FURYCTL_VERSION: v0.32.1
+    volumes:
+      - name: mise-cache
+        path: /mise-data
     depends_on:
       - create-kind-cluster
     commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-$(uname -s)-amd64.tar.gz" -o /tmp/furyctl.tar.gz && tar xfz /tmp/furyctl.tar.gz -C /tmp
-      - mv /tmp/furyctl /usr/local/bin/furyctl && chmod +x /usr/local/bin/furyctl
-      - until kubectl get serviceaccount default > /dev/null 2>&1; do echo "waiting for control-plane" && sleep 1; done
-      - bats -t katalog/tests/harbor/setup.sh
+      - eval "$(mise activate bash --shims)"
+      - mise run e2e-setup
 
   - name: e2e-vulns
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.32.2
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.32.2
-      TEST_DOMAIN: "127.0.0.1.nip.io"
+    volumes:
+      - name: mise-cache
+        path: /mise-data
     depends_on:
       - e2e-setup
     commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - bats -t katalog/tests/harbor/vulns.sh
+      - eval "$(mise activate bash --shims)"
+      - mise run e2e-vulns
 
   - name: e2e-replication
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.32.2
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.32.2
-      TEST_DOMAIN: "127.0.0.1.nip.io"
+    volumes:
+      - name: mise-cache
+        path: /mise-data
     depends_on:
       - e2e-setup
     commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - bats -t katalog/tests/harbor/replication.sh
+      - eval "$(mise activate bash --shims)"
+      - mise run e2e-replication
 
   - name: e2e-registry
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.31.1_5.6.0_4.33.3
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
     volumes:
-      - name: dockersock
-        path: /var/run/docker.sock
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.32.2
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.32.2
-      TEST_DOMAIN: "127.0.0.1.nip.io"
+      - name: mise-cache
+        path: /mise-data
     depends_on:
       - e2e-setup
     commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - bats -t katalog/tests/harbor/registry.sh
+      - eval "$(mise activate bash --shims)"
+      - mise run e2e-registry
 
   - name: delete-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.27.0_1.32.2_5.6.0
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
-    environment:
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.32.2
+      - name: mise-cache
+        path: /mise-data
     commands:
-      - kind delete cluster --name $${CLUSTER_NAME} || true
+      - eval "$(mise activate bash --shims)"
+      - mise run delete-kind-cluster
     depends_on:
       - e2e-vulns
       - e2e-replication
@@ -564,19 +628,19 @@ steps:
         - success
         - failure
 
-volumes:
-  - name: dockersock
-    host:
-      path: /var/run/docker.sock
-
 ---
+
 name: e2e-kubernetes-1.33
 kind: pipeline
 type: docker
 
+environment:
+  CLUSTER_VERSION: v1.33.2
+  MISE_DATA_DIR: /mise-data
+  TEST_DOMAIN: "127.0.0.1.nip.io"
+
 depends_on:
-  - policeman
-  - e2e-kubernetes-1.32
+  - qa
 
 clone:
   depth: 1
@@ -590,102 +654,110 @@ trigger:
     include:
       - refs/tags/**
 
+volumes:
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock
+  - name: mise-cache
+    host:
+      path: /root/mise_data_dir
+
 steps:
   - name: generate-kind-config
     image: alpine:latest
     pull: always
     commands:
-      - sh ./katalog/tests/harbor/config/generate-template.sh v1.33.2
+      - sh ./katalog/tests/harbor/config/generate-template.sh $${CLUSTER_VERSION}
+
+  - name: install-tools
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
+    volumes:
+      - name: mise-cache
+        path: /mise-data
+    commands:
+      - mise install
+      - mise use kubectl@$${CLUSTER_VERSION}
+      - eval "$(mise activate bash --shims)"
 
   - name: create-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.29.0_1.33.4_5.6.0
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     depends_on:
-      - clone
+      - install-tools
+      - generate-kind-config
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
-    environment:
-      CLUSTER_VERSION: v1.33.2
-      KUBECONFIG: kubeconfig-harbor-v1.33.2
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.33.2
+      - name: mise-cache
+        path: /mise-data
     commands:
-      - kind create cluster --name $${CLUSTER_NAME} --image registry.sighup.io/fury/kindest/node:$${CLUSTER_VERSION} --config ./config-$${CLUSTER_NAME}.yaml
-      - kind get kubeconfig --name $${CLUSTER_NAME} > $${KUBECONFIG}
+      - eval "$(mise activate bash --shims)"
+      - mise run create-kind-cluster
 
   - name: e2e-setup
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.33.4_5.6.0_1.9.0_4.33.3
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.33.2
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.33.2
-      # Using nip.io DNS wildcard service to resolve <harbor-domain>.127.0.0.1.nip.io to localhost where Kind exposes services.
-      TEST_DOMAIN: "127.0.0.1.nip.io"
-      FURYCTL_VERSION: v0.33.1
+    volumes:
+      - name: mise-cache
+        path: /mise-data
     depends_on:
       - create-kind-cluster
     commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - curl -L "https://github.com/sighupio/furyctl/releases/download/$${FURYCTL_VERSION}/furyctl-$(uname -s)-amd64.tar.gz" -o /tmp/furyctl.tar.gz && tar xfz /tmp/furyctl.tar.gz -C /tmp
-      - mv /tmp/furyctl /usr/local/bin/furyctl && chmod +x /usr/local/bin/furyctl
-      - until kubectl get serviceaccount default > /dev/null 2>&1; do echo "waiting for control-plane" && sleep 1; done
-      - bats -t katalog/tests/harbor/setup.sh
+      - eval "$(mise activate bash --shims)"
+      - mise run e2e-setup
 
   - name: e2e-vulns
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.33.4_5.6.0_1.9.0_4.33.3
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.33.2
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.33.2
-      TEST_DOMAIN: "127.0.0.1.nip.io"
+    volumes:
+      - name: mise-cache
+        path: /mise-data
     depends_on:
       - e2e-setup
     commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - bats -t katalog/tests/harbor/vulns.sh
+      - eval "$(mise activate bash --shims)"
+      - mise run e2e-vulns
 
   - name: e2e-replication
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.33.4_5.6.0_1.9.0_4.33.3
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.33.2
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.33.2
-      TEST_DOMAIN: "127.0.0.1.nip.io"
+    volumes:
+      - name: mise-cache
+        path: /mise-data
     depends_on:
       - e2e-setup
     commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - bats -t katalog/tests/harbor/replication.sh
+      - eval "$(mise activate bash --shims)"
+      - mise run e2e-replication
 
   - name: e2e-registry
-    image: quay.io/sighup/e2e-testing:2.24.17_1.1.0_3.12.0_1.33.4_5.6.0_1.9.0_4.33.3
+    image: quay.io/sighup/mise:v2025.4.4
     pull: always
     network_mode: host
     volumes:
-      - name: dockersock
-        path: /var/run/docker.sock
-    environment:
-      KUBECONFIG: kubeconfig-harbor-v1.33.2
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.33.2
-      TEST_DOMAIN: "127.0.0.1.nip.io"
+      - name: mise-cache
+        path: /mise-data
     depends_on:
       - e2e-setup
     commands:
-      - . ./env-$${CLUSTER_NAME}.env
-      - bats -t katalog/tests/harbor/registry.sh
+      - eval "$(mise activate bash --shims)"
+      - mise run e2e-registry
 
   - name: delete-kind-cluster
-    image: quay.io/sighup/dind-kind-kubectl-kustomize:0.29.0_1.33.4_5.6.0
+    image: quay.io/sighup/mise:v2025.4.4
+    pull: always
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
-    environment:
-      CLUSTER_NAME: ${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-v1.33.2
+      - name: mise-cache
+        path: /mise-data
     commands:
-      - kind delete cluster --name $${CLUSTER_NAME} || true
+      - eval "$(mise activate bash --shims)"
+      - mise run delete-kind-cluster
     depends_on:
       - e2e-vulns
       - e2e-replication
@@ -695,12 +767,8 @@ steps:
         - success
         - failure
 
-volumes:
-  - name: dockersock
-    host:
-      path: /var/run/docker.sock
-
 ---
+
 name: release
 kind: pipeline
 type: docker

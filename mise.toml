@@ -1,4 +1,10 @@
 [tools]
+# GitHub releases
+kustomize = "5.8.0"
+kind = "0.30.0"
+pluto = "5.22.6"
+furyctl = "0.33.1"
+bats = "1.11.0"
 "ubi:google/addlicense" = "v1.1.1"
 
 [tasks.license-check]
@@ -19,4 +25,45 @@ addlicense -c "SIGHUP s.r.l" -y 2017-present -v -l bsd \
   -ignore 'target/**' \
   -ignore 'vendor/**' \
   .
+"""
+
+[tasks.create-kind-cluster]
+run = """
+CLUSTER_NAME="${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-${CLUSTER_VERSION}"
+kind create cluster --name ${CLUSTER_NAME} --image registry.sighup.io/fury/kindest/node:${CLUSTER_VERSION} --config ./config-${CLUSTER_NAME}.yaml
+kind get kubeconfig --name ${CLUSTER_NAME} > ${KUBECONFIG}
+"""
+
+[tasks.e2e-setup]
+run = """
+CLUSTER_NAME="${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-${CLUSTER_VERSION}"
+. ./env-${CLUSTER_NAME}.env
+bats -t {{config_root}}/katalog/tests/harbor/setup.sh
+"""
+
+[tasks.e2e-vulns]
+run = """
+CLUSTER_NAME="${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-${CLUSTER_VERSION}"
+. ./env-${CLUSTER_NAME}.env
+bats -t {{config_root}}/katalog/tests/harbor/vulns.sh
+"""
+
+[tasks.e2e-replication]
+run = """
+CLUSTER_NAME="${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-${CLUSTER_VERSION}"
+. ./env-${CLUSTER_NAME}.env
+bats -t {{config_root}}/katalog/tests/harbor/replication.sh
+"""
+
+[tasks.e2e-registry]
+run = """
+CLUSTER_NAME="${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-${CLUSTER_VERSION}"
+. ./env-${CLUSTER_NAME}.env
+bats -t {{config_root}}/katalog/tests/harbor/registry.sh
+"""
+
+[tasks.delete-kind-cluster]
+run = """
+CLUSTER_NAME="${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}-harbor-${CLUSTER_VERSION}"
+kind delete cluster --name ${CLUSTER_NAME} || true
 """
