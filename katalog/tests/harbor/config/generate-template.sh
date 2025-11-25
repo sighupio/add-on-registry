@@ -78,6 +78,7 @@ export HTTP_PORT=$UNIQUE_PORT1
 export HTTPS_PORT=$UNIQUE_PORT2
 export KIND_CONFIG=$CONFIG_FILE
 export KUBE_VERSION=$KUBE_VERSION
+export KUBECONFIG=kubeconfig-harbor-$KUBE_VERSION
 EOF
 
 echo "HTTP port configured: $UNIQUE_PORT1"
