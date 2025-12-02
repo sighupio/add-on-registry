@@ -140,7 +140,7 @@ We will work with a folder structure like the following:
 To create it, run:
 
 ```bash
-ADD_ON_VERSION=v3.4.0 # check latest add-on version
+ADD_ON_VERSION=v3.5.0 # check latest add-on version
 kustomize localize "https://github.com/sighupio/add-on-registry//examples/full-to-ha-migration?ref=${ADD_ON_VERSION}" add-on-registry
 cd add-on-registry
 # Download the migration manifests
