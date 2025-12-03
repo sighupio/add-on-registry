@@ -3,12 +3,14 @@
 # license that can be found in the LICENSE file.
 
 ---
+# Source: harbor/templates/portal/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: portal
 spec:
   replicas: 1
+  revisionHistoryLimit: 10
   template:
     spec:
       securityContext:
@@ -17,12 +19,12 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: portal
-          image: goharbor/harbor-portal:v2.11.2
+          image: goharbor/harbor-portal:v2.14.0
           imagePullPolicy: Always
           resources:
             requests:
-              memory: 256Mi
               cpu: 100m
+              memory: 256Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

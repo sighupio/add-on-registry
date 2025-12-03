@@ -20,7 +20,7 @@ spec:
       terminationGracePeriodSeconds: 120
       containers:
         - name: redis
-          image: goharbor/redis-photon:v2.11.2
+          image: goharbor/redis-photon:v2.14.0
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
@@ -43,11 +43,12 @@ spec:
             periodSeconds: 10
           resources:
             requests:
-              memory: 256Mi
               cpu: 100m
+              memory: 256Mi
           volumeMounts:
             - name: data
               mountPath: /var/lib/redis
+              subPath:
   volumeClaimTemplates:
     - metadata:
         name: data

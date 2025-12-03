@@ -14,15 +14,46 @@ helm repo update
 helm search repo harbor/harbor --versions
 ```
 
+### Verify the upstream values.yaml
+
+Check that the `values.yaml` file differs from the `MAINTENANCE.values.yaml` only for expected changes. If the upstream `values.yaml` contains new parameters, copy them into the `MAINTENANCE.values.yaml`.
+
+```bash
+VERSION=v1.18.0 # v2.14.0
+
+curl "https://raw.githubusercontent.com/goharbor/harbor-helm/refs/tags/${VERSION}/values.yaml" -o upstream.values.yaml
+```
+
+Known customizations are:
+
+- `caSecretName: "core-root-ca"`
+- `core.secretName: "core-root-ca"`
+- `expose.tls.certSource: secret`
+- `expose.tls.secret.secretName: "harbor-ingress-cert"`
+- `expose.ingress.annotations.cert-manager.io/cluster-issuer: "letsencrypt-staging"`
+- `imagePullPolicy: Always`
+- `metrics.enabled: true`
+- `metrics.serviceMonitor.enabled: true`
+- `trivy.skipUpdate: true`
+- `trivy.skipJavaDBUpdate: true`
+- `trivy.offlineScan: true`
+- all `resources` for various components
+
 ### Download and template the Helm Chart
 
 ```bash
-VERSION=v1.15.2 #v2.11.2
+VERSION=v1.18.0 #v2.14.0
+HARBOR_VERSION=v2.14.0
 rm -rf vendor
 helm template harbor harbor/harbor --version $VERSION -f MAINTENANCE.values.yaml --output-dir vendor
 for file in $(find ./vendor -type f \( -name "*.yaml" -o -name "*.yml" \)); do
-  yq -i 'del(.metadata.labels, .spec.selector, .spec.template.metadata)' $file
+  yq -i 'del(.metadata.labels, .spec.selector, .spec.template.metadata, .metadata.namespace)' $file
 done
+curl "https://raw.githubusercontent.com/goharbor/harbor/refs/tags/${HARBOR_VERSION}/contrib/grafana-dashboard/metrics-example.json" \
+  | yq '
+    (.panels | .. | select(has "targets") | .. | select(has("expr")).expr) |=
+      sub("service=~\"harbor-\\.\\*\"", "job=\"harbor\""
+    )' -ojson > exporter/dashboards/harbor-general.json
 ```
 
 ### Check the diff and update the images
@@ -86,8 +117,14 @@ Compared to the official dashboards, the following changes have been made:
 #### Prometheus Rules
 
 Harbor upstream does not provide a set of Prometheus Rules that we could include.
-The Prometheus Rules defined in `katalog/harbor/exporter/rules.yml` are inspired by those provided by:
-<https://promcat.io/apps/harbor>
+The Prometheus Rules defined in `katalog/harbor/exporter/rules.yml` are copied from:
+<https://github.com/sysdiglabs/promcat-resources/blob/master/resources/harbor/alerts-v2.2.yaml>
+
+> [!WARNING]
+>
+> The promcat-resources repo has been unmantained for 2+ years.
+> Even though the Rules are working correctly, we might want to open a PR to the upstream project that we use for other systems' rules,  
+> <https://github.com/samber/awesome-prometheus-alerts>, which is more actively maintained.
 
 Once deployed, you will be able to find some `Alert`s defined on the Prometheus dashboard.
 

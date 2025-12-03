@@ -23,7 +23,7 @@ Registry Add-On Module provides the following packages:
 
 | Package                  | Version  | Description                                                                                                                                                          |
 | ------------------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Harbor](katalog/harbor) | `v2.11.2` | Harbor is an open-source container image registry that secures images with role-based access control, scans images for vulnerabilities, and signs images as trusted. |
+| [Harbor](katalog/harbor) | `v2.14.0` | Harbor is an open-source container image registry that secures images with role-based access control, scans images for vulnerabilities, and signs images as trusted. |
 
 Click on each package to see its full documentation.
 
@@ -55,7 +55,7 @@ All packages in this repository have the following dependencies, for package spe
 
     ```bash
     ADD_ON_REGISTRY_DISTRIBUTION="full-harbor" # or "harbor-ha"
-    ADD_ON_REGISTRY_VERSION=v3.4.0 # check the latest version
+    ADD_ON_REGISTRY_VERSION=v3.5.0 # check the latest version
     kustomize localize "https://github.com/sighupio/add-on-registry//katalog/harbor/distributions/${ADD_ON_REGISTRY_DISTRIBUTION}?ref=${ADD_ON_REGISTRY_VERSION}" vendor
     ```
 
@@ -110,9 +110,17 @@ You can monitor the status of Harbor from the provided Grafana Dashboards. Here 
 
 The following set of alerts is included:
 
-| Alert Name                         | Summary                                                                                                                                             | Description                                                                                     |
-| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| HarborIsDown                       | The service of Harbor is Down                                                                                                                       | [Critical]: Check the deployment of Harbor and all components as they may be down               |
+| Alert Name                            | Summary                                      | Description                                                                       |
+| ------------------------------------- | -------------------------------------------- | --------------------------------------------------------------------------------- |
+| HarborCoreIsDown                      | Harbor Core Is Down                          | [High]: Check the `core` Deployment as it may be down                             |
+| HarborDatabaseIsDown                  | Harbor Database Is Down                      | [High]: Check the connection with the Database                                    |
+| HarborRegistryIsDown                  | Harbor Registry Is Down                      | [High]: Check the `registry` Deployment as it may be down                         |
+| HarborRedisIsDown                     | Harbor Redis Is Down                         | [High]: Check the connection with Redis                                           |
+| HarborTrivyIsDown                     | Harbor Trivy Is Down                         | [High]: Check the `trivy` StatefulSet as it may be down                           |
+| HarborJobServiceIsDown                | Harbor JobService Is Down                    | [High]: Check the `jobService` Deployment as it may be down                       |
+| ProjectQuotaIsRaisingTheLimit         | Project Quota Is Raising The Limit           | [High]: Projects are exhausting the global quota                                  |
+| Harborp99latencyishigherthan10seconds | Harbor p99 latency is higher than 10 seconds | [Medium]: Registry's response latencies are higher than usual                     |
+| HarborErrorRateisHigh                 | Harbor Error Rate is High                    | [Medium]: Registry's error rate in responses is higher than usual                 |
 
 ### Examples
 

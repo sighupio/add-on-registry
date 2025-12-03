@@ -3,12 +3,14 @@
 # license that can be found in the LICENSE file.
 
 ---
+# Source: harbor/templates/registry/registry-dpl.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: "registry"
 spec:
   replicas: 1
+  revisionHistoryLimit: 10
   strategy:
     type: RollingUpdate
   template:
@@ -21,7 +23,7 @@ spec:
       terminationGracePeriodSeconds: 120
       containers:
         - name: registry
-          image: goharbor/registry-photon:v2.11.2
+          image: goharbor/registry-photon:v2.14.0
           imagePullPolicy: Always
           livenessProbe:
             httpGet:
@@ -50,16 +52,17 @@ spec:
             runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
-          args: ["serve", "/etc/registry/config.yml"]
           envFrom:
             - secretRef:
                 name: registry
+          env:
           ports:
             - containerPort: 5000
             - containerPort: 8001
           volumeMounts:
             - name: data
               mountPath: /storage
+              subPath:
             - name: registry-passwd
               mountPath: /etc/registry/passwd
               subPath: passwd
@@ -67,7 +70,7 @@ spec:
               mountPath: /etc/registry/config.yml
               subPath: config.yml
         - name: registryctl
-          image: goharbor/harbor-registryctl:v2.11.2
+          image: goharbor/harbor-registryctl:v2.14.0
           imagePullPolicy: Always
           livenessProbe:
             httpGet:
@@ -83,6 +86,10 @@ spec:
               port: 8080
             initialDelaySeconds: 1
             periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -92,10 +99,6 @@ spec:
             runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
-          resources:
-            requests:
-              memory: 256Mi
-              cpu: 100m
           envFrom:
             - secretRef:
                 name: registry

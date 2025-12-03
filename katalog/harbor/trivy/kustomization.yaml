@@ -22,20 +22,23 @@ configMapGenerator:
   - literals:
       - HTTP_PROXY=""
       - HTTPS_PROXY=""
-      - NO_PROXY="core,jobservice,database,chartmuseum,trivy,notary-server,notary-signer,registry,portal,exporter,127.0.0.1,localhost,.local,.internal"
+      - NO_PROXY="core,jobservice,database,registry,portal,trivy,exporter,127.0.0.1,localhost,.local,.internal"
       - SCANNER_LOG_LEVEL="info"
       - SCANNER_TRIVY_CACHE_DIR="/home/scanner/.cache/trivy"
       - SCANNER_TRIVY_REPORTS_DIR="/home/scanner/.cache/reports"
       - SCANNER_TRIVY_DEBUG_MODE="false"
       - SCANNER_TRIVY_VULN_TYPE="os,library"
+      - SCANNER_TRIVY_TIMEOUT="5m0s"
       - SCANNER_TRIVY_SEVERITY="UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
       - SCANNER_TRIVY_IGNORE_UNFIXED="false"
       - SCANNER_TRIVY_SKIP_UPDATE="true"
+      - SCANNER_TRIVY_SKIP_JAVA_DB_UPDATE="true"
+      - SCANNER_TRIVY_DB_REPOSITORY="mirror.gcr.io/aquasec/trivy-db,ghcr.io/aquasecurity/trivy-db"
+      - SCANNER_TRIVY_JAVA_DB_REPOSITORY="mirror.gcr.io/aquasec/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db"
+      - SCANNER_TRIVY_OFFLINE_SCAN="true"
+      - SCANNER_TRIVY_SECURITY_CHECKS="vuln"
       - SCANNER_TRIVY_INSECURE="false"
       - SCANNER_API_SERVER_ADDR=":8080"
-      - SCANNER_TRIVY_TIMEOUT="5m0s"
-      - SCANNER_TRIVY_SECURITY_CHECKS="vuln"
-      - SCANNER_TRIVY_OFFLINE_SCAN="true"
     name: trivy
 
 secretGenerator:

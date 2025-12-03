@@ -19,7 +19,7 @@ spec:
       terminationGracePeriodSeconds: 120
       containers:
         - name: core
-          image: goharbor/harbor-core:v2.11.2
+          image: goharbor/harbor-core:v2.14.0
           imagePullPolicy: Always
           startupProbe:
             httpGet:
@@ -43,10 +43,6 @@ spec:
               port: 8080
             failureThreshold: 2
             periodSeconds: 10
-          resources:
-            requests:
-              memory: 256Mi
-              cpu: 100m
           envFrom:
             - configMapRef:
                 name: core
@@ -88,6 +84,10 @@ spec:
               mountPath: /etc/core/ca
             - name: psc
               mountPath: /etc/core/token
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
       volumes:
         - name: config
           configMap:

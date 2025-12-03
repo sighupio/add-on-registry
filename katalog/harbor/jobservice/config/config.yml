@@ -25,6 +25,7 @@ metric:
   enabled: true
   path: /metrics
   port: 8001
+#Loggers for the job service
 loggers:
   - name: "STD_OUTPUT"
     level: INFO
