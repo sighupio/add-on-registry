@@ -6,8 +6,9 @@
 | ----------------------------------- | :----------------: | :----------------: | :----------------: | :----------------: | :----------------: |
 | v3.2.0                              | :white_check_mark: | :white_check_mark: |                    |                    |                    |
 | v3.3.0                              | :white_check_mark: | :white_check_mark: | :white_check_mark: |                    |                    |
-| v3.4.0                              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| v3.5.0                              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| v3.4.0                              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |                    |
+| v3.5.0                              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |                    |
+| v3.5.1                              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 <!-- markdownlint-enable MD013 -->
 
