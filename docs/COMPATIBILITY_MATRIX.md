@@ -2,11 +2,10 @@
 
 <!-- markdownlint-disable MD013 -->
 
-| Module Version / Kubernetes Version |       1.29.X       |       1.30.X       |       1.31.X       |       1.32.X       |       1.33.X       |
+| Module Version / Kubernetes Version |       1.30.X       |       1.31.X       |       1.32.X       |       1.33.X       |       1.34.x       |
 | ----------------------------------- | :----------------: | :----------------: | :----------------: | :----------------: | :----------------: |
-| v3.1.0                              | :white_check_mark: |                    |                    |                    |                    |
-| v3.2.0                              | :white_check_mark: | :white_check_mark: | :white_check_mark: |                    |                    |
-| v3.3.0                              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |                    |
+| v3.2.0                              | :white_check_mark: | :white_check_mark: |                    |                    |                    |
+| v3.3.0                              | :white_check_mark: | :white_check_mark: | :white_check_mark: |                    |                    |
 | v3.4.0                              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | v3.5.0                              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 

@@ -21,21 +21,21 @@ If you are new to SD please refer to the [official documentation][sd-docs] on ho
 
 Registry Add-On Module provides the following packages:
 
-| Package                  | Version  | Description                                                                                                                                                          |
-| ------------------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Package                  | Version   | Description                                                                                                                                                          |
+| ------------------------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Harbor](katalog/harbor) | `v2.14.0` | Harbor is an open-source container image registry that secures images with role-based access control, scans images for vulnerabilities, and signs images as trusted. |
 
 Click on each package to see its full documentation.
 
 ## Compatibility
 
-| Kubernetes Version |   Compatibility    | Notes                                               |
-| ------------------ | :----------------: | --------------------------------------------------- |
-| `1.29.x`           | :white_check_mark: | Conformance tests passed.                           |
-| `1.30.x`           | :white_check_mark: | Conformance tests passed.                           |
-| `1.31.x`           | :white_check_mark: | Conformance tests passed.                           |
-| `1.32.x`           | :white_check_mark: | Conformance tests passed.                           |
-| `1.33.x`           | :white_check_mark: | Conformance tests passed.                           |
+| Kubernetes Version |   Compatibility    | Notes                     |
+| ------------------ | :----------------: | ------------------------- |
+| `1.30.x`           | :white_check_mark: | Conformance tests passed. |
+| `1.31.x`           | :white_check_mark: | Conformance tests passed. |
+| `1.32.x`           | :white_check_mark: | Conformance tests passed. |
+| `1.33.x`           | :white_check_mark: | Conformance tests passed. |
+| `1.34.x`           | :white_check_mark: | Conformance tests passed. |
 
 The table shows the latest 5 compatible versions. Check the [compatibility matrix][compatibility-matrix] for the complete list of all supported versions.
 
@@ -45,7 +45,7 @@ The table shows the latest 5 compatible versions. Check the [compatibility matri
 
 | Tool                        | Version   | Description                                                                                                                                                    |
 | --------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [kustomize][kustomize-repo] | `>=5.8.0` | Packages are customized using `kustomize`. To learn how to create your customization layer with `kustomize`, please refer to the [repository][kustomize-repo]. |
+| [kustomize][kustomize-repo] | `>=5.6.0` | Packages are customized using `kustomize`. To learn how to create your customization layer with `kustomize`, please refer to the [repository][kustomize-repo]. |
 
 All packages in this repository have the following dependencies, for package specific dependencies, please visit the single package's documentation:
 
