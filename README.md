@@ -21,8 +21,8 @@ If you are new to SD please refer to the [official documentation][sd-docs] on ho
 
 Registry Add-On Module provides the following packages:
 
-| Package                  | Version  | Description                                                                                                                                                          |
-| ------------------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Package                  | Version   | Description                                                                                                                                                          |
+| ------------------------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Harbor](katalog/harbor) | `v2.14.0` | Harbor is an open-source container image registry that secures images with role-based access control, scans images for vulnerabilities, and signs images as trusted. |
 
 Click on each package to see its full documentation.
