@@ -21,7 +21,7 @@ configMapGenerator:
     files:
       - config.yml=config/config.yml
     literals:
-      - CORE_URL=http://core
+      - CORE_URL=http://core:80
       - REGISTRY_URL=http://registry:5000
       - TOKEN_SERVICE_URL=http://core/service/token
       - REGISTRY_CONTROLLER_URL=http://registry:8080

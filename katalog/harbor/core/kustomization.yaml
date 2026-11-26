@@ -30,7 +30,7 @@ configMapGenerator:
       - POSTGRESQL_MAX_IDLE_CONNS=100
       - POSTGRESQL_MAX_OPEN_CONNS=900
       - EXT_ENDPOINT=https://core.harbor.domain
-      - CORE_URL=http://core
+      - CORE_URL=http://core:80
       - JOBSERVICE_URL=http://jobservice
       - REGISTRY_URL=http://registry:5000
       - TOKEN_SERVICE_URL=http://core/service/token
